@@ -1,0 +1,47 @@
+Algoritmo ExtrairTextoPDF
+    Entrada: caminho_do_arquivo_pdf, diretório_de_saida, arquivo_de_configuração
+    Saída: Blocos de texto extraídos em formato JSON e separados por página
+
+    Função CarregarConfig(arquivo_de_configuração)
+        Se arquivo_de_configuração existe
+            Abrir arquivo_de_configuração
+            Carregar configurações
+            retornar o conjunto de strings a serem tratados
+        Caso contrário
+            Retornar conjunto vazio
+        
+
+    Função ExtrairTexto(caminho_do_arquivo_pdf, diretório_de_saida, arquivo_de_configuração)
+        Configurar ignorar_textos e  tratar_textos com CarregarConfig(arquivo_de_configuração)
+
+        Abrir documento PDF a partir de caminho_do_arquivo_pdf
+        Para cada página no documento
+            Definir largura, altura da página
+            Criar objeto de página
+            
+            título_anterior <- ""
+            título_acumulado <- Lista vazia
+            título_atual <- ""
+            texto_atual_bloco <- Lista vazia
+            font_sizes_texto <- Lista vazia
+            font_size_titulo <- 0
+            
+            Para cada bloco de texto na página
+                Para cada linha no bloco de texto
+                    Se texto está na lista de ignorar_textos ou é um número da pagina
+                        ignorar linha
+                    enquanto font_size > 12(tamanho de título)                
+                        título_acumulado<- título_acumulado.append(linha)
+                    fim_enquanto
+                    font_size_titulo <- font_size
+                    titulo_atual <- titulo_acumulado concatenado
+                    enquanto font_size <=12
+                        texto_atual_bloco <- linha
+                        font_sizes_texto <- linha.font_size
+                    fim_enquanto
+                    font_size_media_texto <- média dos font_sizes_texto
+                Adicionar bloco com título_atual, texto_atual_bloco, font_size_titulo, font_size_media_texto
+                titulo_anterior <- titulo_atual
+
+            
+            Salvar página como JSON no diretório_de_saida
