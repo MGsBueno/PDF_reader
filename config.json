@@ -2,9 +2,6 @@
   "input_dir": "./input",
   "output_dir": "./output",
   "ignorar": [
-    "Plano de ação da Agenda 2030 | Prefeitura de São Paulo",
-    "Plano de ação da Agenda 2030   | Prefeitura de São Paulo",
-    "Prefeitura de São Paulo | Plano de ação da Agenda 2030",
-    "Prefeitura de São Paulo |   Plano de ação da Agenda 2030"
+"String_1_ignorada", "String..._ignorada"
   ]
 }
