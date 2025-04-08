@@ -1,10 +1,37 @@
 {
   "input_dir": "./input",
   "output_dir": "./output",
+
   "ignorar": [
-    "Plano de ação da Agenda 2030 | Prefeitura de São Paulo",
-    "Plano de ação da Agenda 2030   | Prefeitura de São Paulo",
-    "Prefeitura de São Paulo | Plano de ação da Agenda 2030",
-    "Prefeitura de São Paulo |   Plano de ação da Agenda 2030"
-  ]
+    "Página",
+    "Agenda Municipal 2030",
+    "Prefeitura de São Paulo",
+    "Contextualização",
+    "Desafios remanescentes"
+  ],
+  "info": "definicioes ODS",
+  "blocos_ODS": {
+    "ODS": {
+      "match": ["^ods\\s*\\d+(\\.\\d+)?"],
+      "fonte_minima": 10,
+      "descricao_fonte_minima": 12
+    },
+    "Meta Global": {
+      "match": ["^meta global"],
+      "fim_ao_encontrar": ["meta municipal"]
+    },
+    "Meta Municipal": {
+      "match": ["^meta municipal"],
+      "fim_ao_encontrar": ["contextualizando"]
+    },
+    "Indicadores": {
+      "match": ["^indicadores", "^indicadores priorizados"],
+      "fim_ao_encontrar": [
+        "desafios remanescentes",
+        "governabilidade",
+        "meta municipal",
+        "^meta global"
+      ]
+    }
+  }
 }

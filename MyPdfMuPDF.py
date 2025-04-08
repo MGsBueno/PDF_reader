@@ -1,94 +1,131 @@
 import fitz  # PyMuPDF
 import json
 import os
-import statistics
+import re
+
 
 class MyPdfMuPDF:
     def __init__(self, pdf_path, output_dir, config_path):
         self.pdf_path = pdf_path
         self.output_dir = output_dir
         self.config_path = config_path
-        self.ignorar_textos, self.tratar_textos = self.carregar_config()
+        self.ignorar_textos = set()
+        self.blocos_config = {}
+        self.resultado_final = []
+        self.load_config()
 
-    def carregar_config(self):
-        """Carrega as configurações de textos a ignorar e tratar."""
-        if os.path.exists(self.config_path):
-            with open(self.config_path, "r", encoding="utf-8") as f:
-                config = json.load(f)
-            return set(config.get("ignorar", [])), set(config.get("tratar", []))
-        return set(), set()
+    def load_config(self):
+        with open(self.config_path, "r", encoding="utf-8") as f:
+            config = json.load(f)
+        self.ignorar_textos = set(config.get("ignorar", []))
+        self.blocos_config = config.get("blocos_ODS", {})
 
-    class Pagina:
-        def __init__(self, numero, largura, altura):
-            self.numero = numero
-            self.largura = largura
-            self.altura = altura
-            self.blocos = []
-
-        def adicionar_bloco(self, titulo, texto, font_size_titulo, font_size_media_texto):
-            """Adiciona um bloco de conteúdo à página."""
-            self.blocos.append({
-                "titulo": titulo,
-                "texto": texto,
-                "font_size_titulo": font_size_titulo,
-                "font_size_media_texto": font_size_media_texto
-            })
-
-        def salvar_como_json(self, output_dir):
-            """Salva a página como JSON."""
-            subpasta = os.path.join(output_dir, "myPdfMuPDF")
-            os.makedirs(subpasta, exist_ok=True)
-            
-            json_data = {
-                "numero": self.numero,
-                "largura": self.largura,
-                "altura": self.altura,
-                "blocos": self.blocos
-            }
-
-            json_path = os.path.join(subpasta, f"pagina_{self.numero}.json")
-            with open(json_path, 'w', encoding='utf-8') as f:
-                json.dump(json_data, f, indent=2, ensure_ascii=False)
+    def detectar_bloco(self, texto, fonte):
+        for nome_bloco, regras in self.blocos_config.items():
+            for pattern in regras.get("match", []):
+                if re.match(pattern, texto.lower()) and fonte >= regras.get("descricao_fonte_minima", 0):
+                    return nome_bloco
+        return None
 
     def extrair_texto(self):
         doc = fitz.open(self.pdf_path)
-        
-        titulo_anterior = ""
-        
+
+        estrutura_atual = None
+        bloco_atual = None
+        texto_acumulado = ""
+        tipo_atual = None
+
         for pagina_pdf in doc:
-            pagina = self.Pagina(pagina_pdf.number + 1, pagina_pdf.rect.width, pagina_pdf.rect.height)
-            titulo_acumulado = []
-            texto_atual_bloco = []
-            font_sizes_texto = []
-            font_size_titulo = 0
-            titulo_atual = ""
+            blocos = pagina_pdf.get_text("dict")['blocks']
+            for bloco in blocos:
+                if 'lines' not in bloco:
+                    continue
+                for linha in bloco['lines']:
+                    spans = linha['spans']
+                    
+                    if not spans:
+                        continue
 
-            linhas = pagina_pdf.get_text("dict")["blocks"]
+                    texto_linha = " ".join([span['text'] for span in spans]).strip()
+                    fonte = max([span['size'] for span in spans])
 
-            for bloco in linhas:
-                if "lines" in bloco:
-                    for linha in bloco["lines"]:
-                        linha_texto = " ".join(span["text"].strip() for span in linha["spans"])
-                        font_size = linha["spans"][0]["size"]
+                    if texto_linha in self.ignorar_textos or not texto_linha:
+                        continue
 
-                        # Ignorar textos e números de página
-                        if linha_texto in self.ignorar_textos or linha_texto.isdigit():
+                    nome_bloco = self.detectar_bloco(texto_linha, fonte)
+
+                    if nome_bloco:
+                        # 🟡 Finalizar e armazenar bloco anterior (se existir)
+                        if tipo_atual:
+                            if bloco_atual:
+                                bloco_atual['texto'] = texto_acumulado.strip()
+                                if tipo_atual != "ODS" and estrutura_atual is not None:
+                                    estrutura_atual['blocos'].append(bloco_atual)
+                                bloco_atual = None
+                                texto_acumulado = ""
+
+                        # 🔧 Finalizar ODS anterior e adicionar ao resultado
+                        if nome_bloco == "ODS":
+                            if estrutura_atual:
+                                if bloco_atual:
+                                    bloco_atual['texto'] = texto_acumulado.strip()
+                                    estrutura_atual['blocos'].append(bloco_atual)
+                                    bloco_atual = None
+                                    texto_acumulado = ""
+                                self.resultado_final.append(estrutura_atual)
+
+                            estrutura_atual = {
+                                "titulo": texto_linha,
+                                "descricao": "",
+                                "blocos": []
+                            }
+                            tipo_atual = "ODS"
+                            continue
+                        else:
+                            bloco_atual = {
+                                "tipo": nome_bloco,
+                                "titulo": texto_linha,
+                                "texto": ""
+                            }
+                            tipo_atual = nome_bloco
+                            texto_acumulado = ""
                             continue
 
-                        # Identificar títulos
-                        if font_size > 12:
-                            titulo_acumulado.append(linha_texto)
-                            font_size_titulo = font_size
-                        else:
-                            texto_atual_bloco.append(linha_texto)
-                            font_sizes_texto.append(font_size)
+                    # 🔵 Adiciona à descrição da ODS (se for apropriado)
+                    if tipo_atual == "ODS" and not nome_bloco and fonte >= self.blocos_config['ODS'].get("descricao_fonte_minima", 12):
+                        estrutura_atual['descricao'] += " " + texto_linha
+                        continue
 
-            titulo_atual = " ".join(titulo_acumulado)
-            if titulo_atual != "":
-               titulo_anterior =  titulo_atual
-            font_size_media_texto = statistics.mean(font_sizes_texto) if font_sizes_texto else 0
-            if (titulo_atual == "" and texto_atual_bloco):
-                titulo_atual = titulo_anterior
-            if titulo_atual and texto_atual_bloco:
-                pagina.adicionar_bloco(titulo_atual, texto_atual_bloco, font_size_titulo, int(font_size_media_texto))
-            pagina.salvar_como_json(self.output_dir)
+                    # 🔵 Continua acumulando texto do bloco atual
+                    if tipo_atual and bloco_atual:
+                        regras = self.blocos_config.get(tipo_atual, {})
+                        fim_ao_conter = regras.get("fim_ao_encontrar", []) 
+                        if any(texto_linha.lower().startswith(fim.lower()) for fim in fim_ao_conter) :
+                            bloco_atual['texto'] = texto_acumulado.strip()
+                            if estrutura_atual:
+                                estrutura_atual['blocos'].append(bloco_atual)
+                            bloco_atual = None
+                            tipo_atual = None
+                            texto_acumulado = ""
+                            continue
+
+                        texto_acumulado += " " + texto_linha
+
+        # 🟢 Finalizar última estrutura
+        if estrutura_atual:
+            if bloco_atual:
+                bloco_atual['texto'] = texto_acumulado.strip()
+                estrutura_atual['blocos'].append(bloco_atual)
+            self.resultado_final.append(estrutura_atual)
+
+        self.salvar_jsons_por_ods()
+
+    def salvar_jsons_por_ods(self):
+        os.makedirs(self.output_dir, exist_ok=True)
+        for i, estrutura in enumerate(self.resultado_final):
+            titulo_sanitizado = estrutura['titulo']
+            filename = f"{i+1:02d}_{titulo_sanitizado}.json"
+            output_path = os.path.join(self.output_dir, filename)
+            with open(output_path, 'w', encoding='utf-8') as f:
+                json.dump(estrutura, f, indent=2, ensure_ascii=False)
+        print(f"✅ Extração concluída. {len(self.resultado_final)} arquivos salvos em: {self.output_dir}")
