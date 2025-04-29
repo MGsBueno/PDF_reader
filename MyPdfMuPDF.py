@@ -61,46 +61,38 @@ class MyPdfMuPDF:
                     nome_bloco = self.detectar_bloco(texto_linha, fonte)
 
                     if nome_bloco:
-                        # 🟡 Finalizar e armazenar bloco anterior (se existir)
-                        if tipo_atual:
-                            if bloco_atual:
-                                bloco_atual['texto'] = texto_acumulado.strip()
-                                if tipo_atual != "ODS" and estrutura_atual is not None:
-                                    estrutura_atual['blocos'].append(bloco_atual)
-                                bloco_atual = None
-                                texto_acumulado = ""
+                        regras_bloco = self.blocos_config[nome_bloco]
 
-                        # 🔧 Finalizar ODS anterior e adicionar ao resultado
-                        if nome_bloco:
-                            regras_bloco = self.blocos_config[nome_bloco]
+                        # 🟡 Finalizar bloco anterior (se existir)
+                        if bloco_atual:
+                            bloco_atual['texto'] = texto_acumulado.strip()
+                            if estrutura_atual is not None:
+                                estrutura_atual['blocos'].append(bloco_atual)
+                            bloco_atual = None
+                            texto_acumulado = ""
 
-                            # 🔧 Finalizar estrutura atual se esse bloco inicia nova
-                            if regras_bloco.get("inicia_estrutura"):
-                                if estrutura_atual:
-                                    if bloco_atual:
-                                        bloco_atual['texto'] = texto_acumulado.strip()
-                                        estrutura_atual['blocos'].append(bloco_atual)
-                                        bloco_atual = None
-                                        texto_acumulado = ""
-                                    self.resultado_final.append(estrutura_atual)
+                        # 🔧 Finalizar estrutura atual se esse bloco inicia nova
+                        if regras_bloco.get("inicia_estrutura"):
+                            if estrutura_atual:
+                                self.resultado_final.append(estrutura_atual)
 
-                                estrutura_atual = {
-                                    "titulo": texto_linha,
-                                    "descricao": "",
-                                    "blocos": []
-                                }
-                                tipo_atual = nome_bloco
-                                continue
-
-                            # 🔵 Caso contrário, iniciar novo bloco dentro da estrutura atual
-                            bloco_atual = {
-                                "tipo": nome_bloco,
+                            estrutura_atual = {
                                 "titulo": texto_linha,
-                                "texto": ""
+                                "descricao": "",
+                                "blocos": []
                             }
                             tipo_atual = nome_bloco
-                            texto_acumulado = ""
                             continue
+
+                        # 🔵 Caso contrário, iniciar novo bloco dentro da estrutura atual
+                        bloco_atual = {
+                            "tipo": nome_bloco,
+                            "titulo": texto_linha,
+                            "texto": ""
+                        }
+                        tipo_atual = nome_bloco
+                        texto_acumulado = ""
+                        continue
 
 
                     # 🔵 Adiciona à descrição da  (se for apropriado)
