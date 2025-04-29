@@ -65,7 +65,7 @@ def main():
         pdf_output_dir = os.path.join(destino_dir, os.path.splitext(pdf_file)[0])
         os.makedirs(pdf_output_dir, exist_ok=True)
      
-        metodo_mupdf = MyPdfMuPDF(pdf_path, pdf_output_dir, "config.json")
+        metodo_mupdf = MyPdfMuPDF(pdf_path, pdf_output_dir, "config.json","doc_type.json")
         processar_pdf_com_metodo(pdf_path, pdf_output_dir, metodo_mupdf, "myPdfMuPDF")
 
 

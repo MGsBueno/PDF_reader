@@ -5,10 +5,11 @@ import re
 
 
 class MyPdfMuPDF:
-    def __init__(self, pdf_path, output_dir, config_path):
+    def __init__(self, pdf_path, output_dir, config_path, doc_type_path):
         self.pdf_path = pdf_path
         self.output_dir = output_dir
         self.config_path = config_path
+        self.doc_type_path = doc_type_path
         self.ignorar_textos = set()
         self.blocos_config = {}
         self.resultado_final = []
@@ -17,8 +18,13 @@ class MyPdfMuPDF:
     def load_config(self):
         with open(self.config_path, "r", encoding="utf-8") as f:
             config = json.load(f)
-        self.ignorar_textos = set(config.get("ignorar", []))
-        self.blocos_config = config.get("blocos_ODS", {})
+        with open(self.doc_type_path, "r", encoding="utf-8") as f:
+            doc_type = json.load(f)
+        for categoria in doc_type.values():
+            if isinstance(categoria, dict) and "blocos" in categoria and "ignorar" in categoria:
+                self.ignorar_textos = set(categoria.get("ignorar", []))
+                self.blocos_config = categoria.get("blocos", {})
+                break
 
     def detectar_bloco(self, texto, fonte):
         for nome_bloco, regras in self.blocos_config.items():
@@ -65,23 +71,28 @@ class MyPdfMuPDF:
                                 texto_acumulado = ""
 
                         # 🔧 Finalizar ODS anterior e adicionar ao resultado
-                        if nome_bloco == "ODS":
-                            if estrutura_atual:
-                                if bloco_atual:
-                                    bloco_atual['texto'] = texto_acumulado.strip()
-                                    estrutura_atual['blocos'].append(bloco_atual)
-                                    bloco_atual = None
-                                    texto_acumulado = ""
-                                self.resultado_final.append(estrutura_atual)
+                        if nome_bloco:
+                            regras_bloco = self.blocos_config[nome_bloco]
 
-                            estrutura_atual = {
-                                "titulo": texto_linha,
-                                "descricao": "",
-                                "blocos": []
-                            }
-                            tipo_atual = "ODS"
-                            continue
-                        else:
+                            # 🔧 Finalizar estrutura atual se esse bloco inicia nova
+                            if regras_bloco.get("inicia_estrutura"):
+                                if estrutura_atual:
+                                    if bloco_atual:
+                                        bloco_atual['texto'] = texto_acumulado.strip()
+                                        estrutura_atual['blocos'].append(bloco_atual)
+                                        bloco_atual = None
+                                        texto_acumulado = ""
+                                    self.resultado_final.append(estrutura_atual)
+
+                                estrutura_atual = {
+                                    "titulo": texto_linha,
+                                    "descricao": "",
+                                    "blocos": []
+                                }
+                                tipo_atual = nome_bloco
+                                continue
+
+                            # 🔵 Caso contrário, iniciar novo bloco dentro da estrutura atual
                             bloco_atual = {
                                 "tipo": nome_bloco,
                                 "titulo": texto_linha,
@@ -91,10 +102,13 @@ class MyPdfMuPDF:
                             texto_acumulado = ""
                             continue
 
-                    # 🔵 Adiciona à descrição da ODS (se for apropriado)
-                    if tipo_atual == "ODS" and not nome_bloco and fonte >= self.blocos_config['ODS'].get("descricao_fonte_minima", 12):
-                        estrutura_atual['descricao'] += " " + texto_linha
-                        continue
+
+                    # 🔵 Adiciona à descrição da  (se for apropriado)
+                    if tipo_atual and self.blocos_config.get(tipo_atual, {}).get("usa_descricao") and not nome_bloco:
+                        if fonte >= self.blocos_config[tipo_atual].get("descricao_fonte_minima", 12):
+                            estrutura_atual['descricao'] += " " + texto_linha
+                            continue
+
 
                     # 🔵 Continua acumulando texto do bloco atual
                     if tipo_atual and bloco_atual:
