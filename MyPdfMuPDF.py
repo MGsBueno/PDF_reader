@@ -124,9 +124,9 @@ class MyPdfMuPDF:
                 estrutura_atual['blocos'].append(bloco_atual)
             self.resultado_final.append(estrutura_atual)
 
-        self.salvar_jsons_por_ods()
+        self.salvar_jsons()
 
-    def salvar_jsons_por_ods(self):
+    def salvar_jsons(self):
         os.makedirs(self.output_dir, exist_ok=True)
         for i, estrutura in enumerate(self.resultado_final):
             titulo_sanitizado = estrutura['titulo']
