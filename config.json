@@ -1,7 +1,0 @@
-{
-  "input_dir": "./input",
-  "output_dir": "./output",
-  "ignorar": [
-"String_1_ignorada", "String..._ignorada"
-  ]
-}

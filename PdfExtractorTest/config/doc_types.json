@@ -1,0 +1,53 @@
+{
+  "ODS": {
+    "blocos": {
+      "ods": {
+        "match": [
+          "^ods"
+        ],
+        "fonte_minima": 14,
+        "descricao_fonte_minima": 10,
+        "inicia_estrutura": false,
+        "usa_descricao": false,
+        "fim_ao_encontrar": []
+      },
+      "meta global": {
+        "match": [
+          "^meta global"
+        ],
+        "fonte_minima": 14,
+        "descricao_fonte_minima": 10,
+        "inicia_estrutura": false,
+        "usa_descricao": false,
+        "fim_ao_encontrar": []
+      },
+      "Meta Municipal": {
+        "match": [
+          "^meta municipal"
+        ],
+        "fonte_minima": 14,
+        "descricao_fonte_minima": 10,
+        "inicia_estrutura": false,
+        "usa_descricao": false,
+        "fim_ao_encontrar": []
+      },
+      "Indicadores": {
+        "match": [
+          "^indicadores"
+        ],
+        "fonte_minima": 14,
+        "descricao_fonte_minima": 10,
+        "inicia_estrutura": false,
+        "usa_descricao": false,
+        "fim_ao_encontrar": []
+      }
+    },
+    "ignorar": [
+      "P\u00E1gina",
+      "Agenda Municipal 2030",
+      "Prefeitura de S\u00E3o Paulo",
+      "Contextualiza\u00E7\u00E3o",
+      "Desafios remanescentes"
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.csproj.AssemblyReference.cache
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.AssemblyInfoInputs.cache
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.AssemblyInfo.cs
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.csproj.CoreCompileInputs.cache
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\bin\Debug\net8.0\PdfExtractor.deps.json
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\bin\Debug\net8.0\PdfExtractor.dll
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\bin\Debug\net8.0\PdfExtractor.pdb
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.dll
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\refint\PdfExtractor.dll
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\PdfExtractor.pdb
+C:\Users\mauro\OneDrive\Desktop\IA\C#\PdfExtractor\obj\Debug\net8.0\ref\PdfExtractor.dll
