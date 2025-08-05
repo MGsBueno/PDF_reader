@@ -4,9 +4,6 @@ import time
 from MyPdfMuPDF import MyPdfMuPDF
 
 def carregar_config():
-    """
-    Carrega as configurações de caminho de origem e saída a partir do arquivo config.json.
-    """
     config_path = "config.json"
     
     if not os.path.exists(config_path):
@@ -19,14 +16,9 @@ def carregar_config():
     return config
 
 
-def processar_pdf_com_metodo(pdf_path, pdf_output_dir, metodo, metodo_nome):
-    """
-    Processa o PDF usando o método especificado e salva os resultados em JSON por página.
-    """
+def processar_pdf_com_metodo(metodo, metodo_nome):
     start_time = time.time()
-    
-    metodo.extrair_texto()
-    
+    metodo.processar()
     end_time = time.time()
     tempo_execucao = end_time - start_time
     
@@ -35,38 +27,36 @@ def processar_pdf_com_metodo(pdf_path, pdf_output_dir, metodo, metodo_nome):
 
 
 def main():
-    """
-    Função principal que lida com os argumentos e chama a função de processamento.
-    """
     config = carregar_config()
-    
     if not config:
         return
-    
-    origem_dir = os.path.abspath(config.get("input_dir"))
-    destino_dir = os.path.abspath(config.get("output_dir"))
-    
+
+    origem_dir = os.path.abspath(config.get("input_dir", "pdfs"))
+    destino_dir = os.path.abspath(config.get("output_dir", "output"))
+
     if not os.path.exists(origem_dir):
         print(f"A pasta {origem_dir} não existe. Verifique o caminho.")
         return
-    
-    os.makedirs(destino_dir, exist_ok=True)
-    
-    arquivos_pdf = [f for f in os.listdir(origem_dir) if f.lower().endswith(".pdf")]
-    
+
+    if not os.path.exists(destino_dir):
+        os.makedirs(destino_dir, exist_ok=True)
+
+    arquivos_pdf = [os.path.join(origem_dir, f) for f in os.listdir(origem_dir) if f.lower().endswith(".pdf")]
+
     if not arquivos_pdf:
         print(f"Nenhum arquivo PDF encontrado na pasta {origem_dir}.")
         return
-    
-    for pdf_file in arquivos_pdf:
-        pdf_path = os.path.join(origem_dir, pdf_file)
-        print(f"Processando o PDF: {pdf_file}")
-        
-        pdf_output_dir = os.path.join(destino_dir, os.path.splitext(pdf_file)[0])
-        os.makedirs(pdf_output_dir, exist_ok=True)
-     
-        metodo_mupdf = MyPdfMuPDF(pdf_path, pdf_output_dir, "config.json","doc_type.json")
-        processar_pdf_com_metodo(pdf_path, pdf_output_dir, metodo_mupdf, "myPdfMuPDF")
+
+    # Caminho único para o XML de saída
+    arquivo_saida_xml = os.path.join(destino_dir, "dump.xml")
+
+    # Caminho para o json doc_type
+    doc_type_path = "doc_type.json"
+
+    print(f"Processando {len(arquivos_pdf)} arquivos PDF...")
+
+    metodo_mupdf = MyPdfMuPDF(arquivos_pdf, arquivo_saida_xml, doc_type_path)
+    processar_pdf_com_metodo(metodo_mupdf, "MyPdfMuPDF")
 
 
 if __name__ == "__main__":
