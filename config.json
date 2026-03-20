@@ -1,7 +1,6 @@
 {
   "input_dir": "./input",
   "output_dir": "./output",
-  "ignorar": [
-"String_1_ignorada", "String..._ignorada"
-  ]
+  "docs": [{ "type": "ODS" }],
+  "ignorar": ["String_1_ignorada", "String..._ignorada"]
 }

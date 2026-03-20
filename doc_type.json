@@ -1,0 +1,37 @@
+{
+  "ODS": {
+    "blocos": {
+      "ODS": {
+        "match": ["^ods\\s*\\d+(\\.\\d+)?"],
+        "fonte_minima": 10,
+        "descricao_fonte_minima": 12,
+        "inicia_estrutura": true,
+        "usa_descricao": true
+      },
+      "Meta Global": {
+        "match": ["^meta global"],
+        "fim_ao_encontrar": ["meta municipal"]
+      },
+      "Meta Municipal": {
+        "match": ["^meta municipal"],
+        "fim_ao_encontrar": ["contextualizando"]
+      },
+      "Indicadores": {
+        "match": ["^indicadores", "^indicadores priorizados"],
+        "fim_ao_encontrar": [
+          "desafios remanescentes",
+          "governabilidade",
+          "meta municipal",
+          "^meta global"
+        ]
+      }
+    },
+    "ignorar": [
+      "Página",
+      "Agenda Municipal 2030",
+      "Prefeitura de São Paulo",
+      "Contextualização",
+      "Desafios remanescentes"
+    ]
+  }
+}
