@@ -1,4 +1,6 @@
 import json
+from typing import Any
+
 from pdf_reader.application.generate_doc_type import (
     build_doc_type,
     create_block,
@@ -23,7 +25,7 @@ def test_create_doc_type_structure(tmp_path):
 
 
 def test_save_json_writes_file(tmp_path):
-    data = {"structures": {"blocks": {}}}
+    data: dict[str, Any] = {"structures": {"blocks": {}}}
     path = tmp_path / "doc_type_test.json"
     save_json(data, file_name=str(path))
     with open(path, "r", encoding="utf-8") as f:

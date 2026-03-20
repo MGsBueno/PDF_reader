@@ -41,6 +41,9 @@ class MuPdfBlockExtractor:
         self.block_order = list(self.block_config.keys())
 
     def detect_block(self, text, font_size):
+        if self._detector is None:
+            raise ValueError("Block detector is not initialized")
+
         return self._detector.detect(
             LineData(text=text, font_size=font_size, is_bold=True)
         )
