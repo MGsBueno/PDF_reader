@@ -1,5 +1,5 @@
 import json
-from pdf_reader.application.generate_doc_type import create_block, create_doc_type, save_json
+from pdf_reader.application.generate_doc_type import build_doc_type, create_block, create_doc_type, save_json
 
 def test_criar_bloco_fields():
     nome, bloco = create_block("Titulo", match=[r"^titulo"], minimum_font_size=12)
@@ -23,3 +23,10 @@ def test_salvar_json_writes_file(tmp_path):
     with open(path, "r", encoding="utf-8") as f:
         loaded = json.load(f)
     assert loaded == data
+
+
+def test_build_doc_type_uses_generic_profile_by_name():
+    doc_type = build_doc_type("generic_example")
+    assert "estruturas" in doc_type
+    assert "Titulo" in doc_type["estruturas"]["blocos"]
+    assert doc_type["estruturas"]["ignorar"] == ["Pagina", "Cabecalho", "Rodape"]

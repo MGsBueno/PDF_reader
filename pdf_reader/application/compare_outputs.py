@@ -21,32 +21,29 @@ def compare_jsons(json1, json2):
     return True
 
 
-def compare_folders(folder1, folder2, folder3, output_path):
+def compare_folders(targets, output_path):
     differences = {}
+    if len(targets) < 2:
+        raise ValueError("At least two comparison targets are required.")
 
-    files1 = set(os.listdir(folder1))
-    files2 = set(os.listdir(folder2))
-    files3 = set(os.listdir(folder3))
-    common_files = files1.intersection(files2, files3)
+    files_by_target = {target.name: set(os.listdir(target.path)) for target in targets}
+    common_files = set.intersection(*(files for files in files_by_target.values()))
 
     for file_name in common_files:
-        path1 = os.path.join(folder1, file_name)
-        path2 = os.path.join(folder2, file_name)
-        path3 = os.path.join(folder3, file_name)
-
         try:
-            json1 = load_json(path1)
-            json2 = load_json(path2)
-            json3 = load_json(path3)
+            loaded_jsons = {
+                target.name: load_json(os.path.join(target.path, file_name))
+                for target in targets
+            }
+            target_names = list(loaded_jsons.keys())
+            difference = []
 
-            if not (compare_jsons(json1, json2) and compare_jsons(json2, json3) and compare_jsons(json1, json3)):
-                difference = []
-                if not compare_jsons(json1, json2):
-                    difference.append("pasta1 vs pasta2")
-                if not compare_jsons(json2, json3):
-                    difference.append("pasta2 vs pasta3")
-                if not compare_jsons(json1, json3):
-                    difference.append("pasta1 vs pasta3")
+            for index, left_name in enumerate(target_names):
+                for right_name in target_names[index + 1 :]:
+                    if not compare_jsons(loaded_jsons[left_name], loaded_jsons[right_name]):
+                        difference.append(f"{left_name} vs {right_name}")
+
+            if difference:
                 differences[file_name] = difference
         except Exception as error:
             print(f"Erro ao comparar o arquivo {file_name}: {error}")

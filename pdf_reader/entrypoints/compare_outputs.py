@@ -1,15 +1,20 @@
 import os
 
 from pdf_reader.application.compare_outputs import compare_folders
+from pdf_reader.application.config import ComparisonTarget, load_runtime_config
 
 
 def main():
-    output_dir = "./output/"
-    folder1 = os.path.join(output_dir, "myPdfMiner")
-    folder2 = os.path.join(output_dir, "myPdfMuPDF")
-    folder3 = os.path.join(output_dir, "myPdfPlumber")
-    output_path = os.path.join(output_dir, "diferencas.json")
-    compare_folders(folder1, folder2, folder3, output_path)
+    config = load_runtime_config("config.json")
+    if not config:
+        return
+
+    targets = [
+        ComparisonTarget(name=target.name, path=os.path.abspath(target.path))
+        for target in config.comparison.targets
+    ]
+    output_path = os.path.join(os.path.abspath(config.output_dir), config.comparison.output_file)
+    compare_folders(targets, output_path)
     print("comparacao concluida!")
 
 

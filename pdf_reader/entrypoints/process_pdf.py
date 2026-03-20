@@ -9,8 +9,8 @@ def main():
     if not config:
         return
 
-    input_dir = os.path.abspath(config.get("input_dir", "pdfs"))
-    output_dir = os.path.abspath(config.get("output_dir", "output"))
+    input_dir = os.path.abspath(config.input_dir)
+    output_dir = os.path.abspath(config.output_dir)
 
     if not os.path.exists(input_dir):
         print(f"A pasta {input_dir} nao existe. Verifique o caminho.")
@@ -24,8 +24,8 @@ def main():
         print(f"Nenhum arquivo PDF encontrado na pasta {input_dir}.")
         return
 
-    output_xml_path = os.path.join(output_dir, "dump.xml")
-    doc_type_path = "doc_type.json"
+    output_xml_path = os.path.join(output_dir, config.processing.output_file)
+    doc_type_path = config.processing.doc_type_path
 
     print(f"Processando {len(pdf_files)} arquivos PDF...")
     processor = PdfBatchProcessor()
