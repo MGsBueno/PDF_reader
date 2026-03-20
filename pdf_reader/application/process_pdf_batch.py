@@ -1,0 +1,72 @@
+import os
+import time
+
+from pdf_reader.domain.models import BlockContent
+from pdf_reader.domain.services import BlockDetector
+from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
+from pdf_reader.infrastructure.extractors.pymupdf_extractor import PyMuPdfLineExtractor
+from pdf_reader.infrastructure.writers.xml_writer import XmlBlockWriter
+
+
+class PdfBatchProcessor:
+    def __init__(self, line_extractor: PyMuPdfLineExtractor | None = None, config_loader: JsonDocumentTypeConfigLoader | None = None):
+        self._line_extractor = line_extractor or PyMuPdfLineExtractor()
+        self._config_loader = config_loader or JsonDocumentTypeConfigLoader()
+
+    def process(self, pdf_paths: list[str], output_xml_path: str, doc_type_path: str) -> None:
+        config = self._config_loader.load(doc_type_path)
+        detector = BlockDetector(config)
+        writer = XmlBlockWriter(output_xml_path)
+
+        writer.start_document()
+        for pdf_path in pdf_paths:
+            self._process_single_pdf(pdf_path, detector, writer)
+        writer.finish_document()
+
+    def _process_single_pdf(self, pdf_path: str, detector: BlockDetector, writer: XmlBlockWriter) -> None:
+        current_block_name: str | None = None
+        current_text = ""
+
+        for line in self._line_extractor.extract_lines(pdf_path):
+            if detector.should_ignore(line.text):
+                if current_block_name:
+                    writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+                    current_block_name = None
+                    current_text = ""
+                continue
+
+            block_name = detector.detect(line)
+            if block_name:
+                if current_block_name:
+                    writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+                current_block_name = block_name
+                current_text = line.text
+                continue
+
+            if current_block_name:
+                current_text += f" {line.text}"
+
+        if current_block_name:
+            writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+
+
+def collect_pdf_paths(input_dir: str) -> list[str]:
+    return [
+        os.path.join(input_dir, file_name)
+        for file_name in os.listdir(input_dir)
+        if file_name.lower().endswith(".pdf")
+    ]
+
+
+def run_processing_job(
+    processor: PdfBatchProcessor,
+    pdf_paths: list[str],
+    output_xml_path: str,
+    doc_type_path: str,
+    method_name: str,
+) -> None:
+    start_time = time.time()
+    processor.process(pdf_paths, output_xml_path, doc_type_path)
+    elapsed_time = time.time() - start_time
+    print(f"Processamento concluido com {method_name}.")
+    print(f"Tempo de execucao de {method_name}: {elapsed_time:.2f} segundos.")
