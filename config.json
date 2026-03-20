@@ -1,6 +1,20 @@
 {
   "input_dir": "./input",
   "output_dir": "./output",
-  "docs": [{ "type": "ODS" }],
-  "ignorar": ["String_1_ignorada", "String..._ignorada"]
+  "processing": {
+    "output_file": "result.xml",
+    "doc_type_path": "doc_type.json"
+  },
+  "comparison": {
+    "output_file": "differences.json",
+    "targets": [
+      { "name": "extractor_a", "path": "./output/extractor_a" },
+      { "name": "extractor_b", "path": "./output/extractor_b" },
+      { "name": "extractor_c", "path": "./output/extractor_c" }
+    ]
+  },
+  "doc_type_generation": {
+    "profile": "generic_example",
+    "output_path": "doc_type.json"
+  }
 }
