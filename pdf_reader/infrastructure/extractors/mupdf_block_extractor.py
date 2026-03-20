@@ -1,3 +1,6 @@
+import warnings
+
+from pdf_reader.bootstrap import create_pdf_batch_processor
 from pdf_reader.application.process_pdf_batch import PdfBatchProcessor
 from pdf_reader.domain.models import BlockContent, LineData
 from pdf_reader.domain.services import BlockDetector, serialize_block
@@ -5,13 +8,21 @@ from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
 
 
 class MuPdfBlockExtractor:
+    """Legacy compatibility wrapper around the main PDF batch processor."""
+
     def __init__(self, pdf_paths, output_xml_path, doc_type_path):
+        warnings.warn(
+            "MuPdfBlockExtractor is a legacy compatibility wrapper. "
+            "Prefer PdfBatchProcessor via the composition root for new integrations.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.pdf_paths = pdf_paths
         self.output_xml_path = output_xml_path
         self.doc_type_path = doc_type_path
         self._config = None
         self._detector = None
-        self._processor = PdfBatchProcessor()
+        self._processor = create_pdf_batch_processor()
         self.block_config = {}
         self.ignored_texts = set()
         self.block_order = []

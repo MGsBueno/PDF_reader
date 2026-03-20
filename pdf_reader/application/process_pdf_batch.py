@@ -3,27 +3,31 @@ import time
 
 from pdf_reader.domain.models import BlockContent
 from pdf_reader.domain.services import BlockDetector
-from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
-from pdf_reader.infrastructure.extractors.pymupdf_extractor import PyMuPdfLineExtractor
-from pdf_reader.infrastructure.writers.xml_writer import XmlBlockWriter
+from pdf_reader.application.ports import BlockWriter, BlockWriterFactory, DocumentTypeConfigLoader, LineExtractor
 
 
 class PdfBatchProcessor:
-    def __init__(self, line_extractor: PyMuPdfLineExtractor | None = None, config_loader: JsonDocumentTypeConfigLoader | None = None):
-        self._line_extractor = line_extractor or PyMuPdfLineExtractor()
-        self._config_loader = config_loader or JsonDocumentTypeConfigLoader()
+    def __init__(
+        self,
+        line_extractor: LineExtractor,
+        config_loader: DocumentTypeConfigLoader,
+        writer_factory: BlockWriterFactory,
+    ):
+        self._line_extractor = line_extractor
+        self._config_loader = config_loader
+        self._writer_factory = writer_factory
 
     def process(self, pdf_paths: list[str], output_xml_path: str, doc_type_path: str) -> None:
         config = self._config_loader.load(doc_type_path)
         detector = BlockDetector(config)
-        writer = XmlBlockWriter(output_xml_path)
+        writer = self._writer_factory(output_xml_path)
 
         writer.start_document()
         for pdf_path in pdf_paths:
             self._process_single_pdf(pdf_path, detector, writer)
         writer.finish_document()
 
-    def _process_single_pdf(self, pdf_path: str, detector: BlockDetector, writer: XmlBlockWriter) -> None:
+    def _process_single_pdf(self, pdf_path: str, detector: BlockDetector, writer: BlockWriter) -> None:
         current_block_name: str | None = None
         current_text = ""
 

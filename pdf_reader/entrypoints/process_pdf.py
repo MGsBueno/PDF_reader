@@ -1,7 +1,8 @@
 import os
 
 from pdf_reader.application.config import load_runtime_config
-from pdf_reader.application.process_pdf_batch import PdfBatchProcessor, collect_pdf_paths, run_processing_job
+from pdf_reader.application.process_pdf_batch import collect_pdf_paths, run_processing_job
+from pdf_reader.bootstrap import create_pdf_batch_processor
 from pdf_reader.entrypoints._cli import parse_config_path
 
 
@@ -31,7 +32,7 @@ def main():
     doc_type_path = config.processing.doc_type_path
 
     print(f"Processing {len(pdf_files)} PDF files...")
-    processor = PdfBatchProcessor()
+    processor = create_pdf_batch_processor()
     run_processing_job(processor, pdf_files, output_xml_path, doc_type_path, "PyMuPDF")
 
 

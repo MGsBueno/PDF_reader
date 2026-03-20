@@ -11,28 +11,41 @@ class FakeExtractor:
         ]
 
 
-def test_pdf_batch_processor_uses_layers(tmp_path):
-    doc_type_path = tmp_path / "doc_type.json"
-    doc_type_path.write_text(
-        """
-{
-  "structures": {
-    "blocks": {
-      "Title": {
-        "match": ["^title"],
-        "minimum_description_font_size": 10
-      }
-    },
-    "ignore": ["end"]
-  }
-}
-        """.strip(),
-        encoding="utf-8",
-    )
+class FakeConfigLoader:
+    def load(self, doc_type_path: str):
+        from pdf_reader.domain.models import BlockRule, DocumentTypeConfig
 
+        return DocumentTypeConfig(
+            blocks={"Title": BlockRule(match=[r"^title"], minimum_description_font_size=10)},
+            ignore={"end"},
+        )
+
+
+class FakeWriter:
+    def __init__(self, output_path: str):
+        self.output_path = output_path
+
+    def start_document(self) -> None:
+        with open(self.output_path, "w", encoding="utf-8") as file:
+            file.write("<data>\n")
+
+    def write_block(self, block) -> None:
+        with open(self.output_path, "a", encoding="utf-8") as file:
+            file.write(f"  <{block.name}>{block.text}</{block.name}>\n")
+
+    def finish_document(self) -> None:
+        with open(self.output_path, "a", encoding="utf-8") as file:
+            file.write("</data>\n")
+
+
+def test_pdf_batch_processor_uses_layers(tmp_path):
     output_path = tmp_path / "output.xml"
-    processor = PdfBatchProcessor(line_extractor=FakeExtractor())
-    processor.process(["fake.pdf"], str(output_path), str(doc_type_path))
+    processor = PdfBatchProcessor(
+        line_extractor=FakeExtractor(),
+        config_loader=FakeConfigLoader(),
+        writer_factory=FakeWriter,
+    )
+    processor.process(["fake.pdf"], str(output_path), "unused.json")
 
     content = output_path.read_text(encoding="utf-8")
     assert "<data>" in content
