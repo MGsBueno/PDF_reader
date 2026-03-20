@@ -16,7 +16,9 @@ class FakeConfigLoader:
         from pdf_reader.domain.models import BlockRule, DocumentTypeConfig
 
         return DocumentTypeConfig(
-            blocks={"Title": BlockRule(match=[r"^title"], minimum_description_font_size=10)},
+            blocks={
+                "Title": BlockRule(match=[r"^title"], minimum_description_font_size=10)
+            },
             ignore={"end"},
         )
 

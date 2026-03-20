@@ -1,6 +1,5 @@
 import json
 
-
 PROFILE_LIBRARY = {
     "generic_example": {
         "context_name": "structures",

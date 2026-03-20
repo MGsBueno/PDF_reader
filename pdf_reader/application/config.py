@@ -33,7 +33,9 @@ class RuntimeConfig:
     output_dir: str = "./output"
     processing: ProcessingConfig = field(default_factory=ProcessingConfig)
     comparison: ComparisonConfig = field(default_factory=ComparisonConfig)
-    doc_type_generation: DocTypeGenerationConfig = field(default_factory=DocTypeGenerationConfig)
+    doc_type_generation: DocTypeGenerationConfig = field(
+        default_factory=DocTypeGenerationConfig
+    )
 
 
 def _load_dotenv(env_path: str) -> dict[str, str]:
@@ -76,8 +78,12 @@ def _apply_env_overrides(data: dict) -> dict:
     comparison_data = dict(runtime_data.get("comparison", {}))
     doc_type_generation_data = dict(runtime_data.get("doc_type_generation", {}))
 
-    runtime_data["input_dir"] = _env_or_value("PDF_READER_INPUT_DIR", runtime_data.get("input_dir", "./input"))
-    runtime_data["output_dir"] = _env_or_value("PDF_READER_OUTPUT_DIR", runtime_data.get("output_dir", "./output"))
+    runtime_data["input_dir"] = _env_or_value(
+        "PDF_READER_INPUT_DIR", runtime_data.get("input_dir", "./input")
+    )
+    runtime_data["output_dir"] = _env_or_value(
+        "PDF_READER_OUTPUT_DIR", runtime_data.get("output_dir", "./output")
+    )
 
     processing_data["output_file"] = _env_or_value(
         "PDF_READER_OUTPUT_FILE",
@@ -123,7 +129,10 @@ def _build_comparison_targets(raw_targets: list[dict] | None) -> list[Comparison
             ComparisonTarget(name="extractor_c", path="./output/extractor_c"),
         ]
 
-    return [ComparisonTarget(name=target["name"], path=target["path"]) for target in raw_targets]
+    return [
+        ComparisonTarget(name=target["name"], path=target["path"])
+        for target in raw_targets
+    ]
 
 
 def build_runtime_config(data: dict) -> RuntimeConfig:
@@ -173,7 +182,9 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
         ),
         comparison=ComparisonConfig(
             targets=[
-                ComparisonTarget(name=target.name, path=_resolve_path(base_dir, target.path))
+                ComparisonTarget(
+                    name=target.name, path=_resolve_path(base_dir, target.path)
+                )
                 for target in config.comparison.targets
             ],
             output_file=config.comparison.output_file,

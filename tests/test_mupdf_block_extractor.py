@@ -1,7 +1,9 @@
 import json
 import warnings
 
-from pdf_reader.infrastructure.extractors.mupdf_block_extractor import MuPdfBlockExtractor
+from pdf_reader.infrastructure.extractors.mupdf_block_extractor import (
+    MuPdfBlockExtractor,
+)
 
 
 def test_detect_block(tmp_path):
@@ -31,7 +33,9 @@ def test_detect_block(tmp_path):
 def test_write_xml_entry(tmp_path):
     doc_type_path = tmp_path / "doc_type.json"
     with open(doc_type_path, "w", encoding="utf-8") as file:
-        json.dump({"structures": {"blocks": {}, "ignore": []}}, file, ensure_ascii=False)
+        json.dump(
+            {"structures": {"blocks": {}, "ignore": []}}, file, ensure_ascii=False
+        )
 
     output_xml_path = tmp_path / "output.xml"
     with warnings.catch_warnings():
@@ -46,7 +50,9 @@ def test_write_xml_entry(tmp_path):
 def test_legacy_extractor_emits_deprecation_warning(tmp_path):
     doc_type_path = tmp_path / "doc_type.json"
     with open(doc_type_path, "w", encoding="utf-8") as file:
-        json.dump({"structures": {"blocks": {}, "ignore": []}}, file, ensure_ascii=False)
+        json.dump(
+            {"structures": {"blocks": {}, "ignore": []}}, file, ensure_ascii=False
+        )
 
     output_xml_path = tmp_path / "output.xml"
     with warnings.catch_warnings(record=True) as captured:

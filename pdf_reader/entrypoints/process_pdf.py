@@ -1,7 +1,10 @@
 import os
 
 from pdf_reader.application.config import load_runtime_config
-from pdf_reader.application.process_pdf_batch import collect_pdf_paths, run_processing_job
+from pdf_reader.application.process_pdf_batch import (
+    collect_pdf_paths,
+    run_processing_job,
+)
 from pdf_reader.bootstrap import create_pdf_batch_processor
 from pdf_reader.entrypoints._cli import parse_config_path
 

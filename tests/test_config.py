@@ -74,9 +74,15 @@ def test_load_runtime_config_resolves_paths_from_config_directory(tmp_path):
     assert config is not None
     assert config.input_dir == str((config_path.parent / "docs").resolve())
     assert config.output_dir == str((config_path.parent / "artifacts").resolve())
-    assert config.processing.doc_type_path == str((config_path.parent / "schemas" / "doc_type.json").resolve())
-    assert config.comparison.targets[0].path == str((config_path.parent / "artifacts" / "a").resolve())
-    assert config.doc_type_generation.output_path == str((config_path.parent / "generated" / "doc_type.json").resolve())
+    assert config.processing.doc_type_path == str(
+        (config_path.parent / "schemas" / "doc_type.json").resolve()
+    )
+    assert config.comparison.targets[0].path == str(
+        (config_path.parent / "artifacts" / "a").resolve()
+    )
+    assert config.doc_type_generation.output_path == str(
+        (config_path.parent / "generated" / "doc_type.json").resolve()
+    )
 
 
 def test_load_runtime_config_uses_dotenv_overrides(tmp_path, monkeypatch):
@@ -126,9 +132,13 @@ PDF_READER_DOC_TYPE_OUTPUT_PATH=./generated/env-doc-type.json
     assert config.input_dir == str((tmp_path / "env-input").resolve())
     assert config.output_dir == str((tmp_path / "env-output").resolve())
     assert config.processing.output_file == "env-result.xml"
-    assert config.processing.doc_type_path == str((tmp_path / "schemas" / "env-doc-type.json").resolve())
+    assert config.processing.doc_type_path == str(
+        (tmp_path / "schemas" / "env-doc-type.json").resolve()
+    )
     assert config.doc_type_generation.profile == "structured_report_example"
-    assert config.doc_type_generation.output_path == str((tmp_path / "generated" / "env-doc-type.json").resolve())
+    assert config.doc_type_generation.output_path == str(
+        (tmp_path / "generated" / "env-doc-type.json").resolve()
+    )
 
 
 def test_load_runtime_config_expands_env_placeholders(tmp_path, monkeypatch):

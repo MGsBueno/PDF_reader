@@ -1,7 +1,6 @@
 import warnings
 
 from pdf_reader.bootstrap import create_pdf_batch_processor
-from pdf_reader.application.process_pdf_batch import PdfBatchProcessor
 from pdf_reader.domain.models import BlockContent, LineData
 from pdf_reader.domain.services import BlockDetector, serialize_block
 from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
@@ -42,14 +41,18 @@ class MuPdfBlockExtractor:
         self.block_order = list(self.block_config.keys())
 
     def detect_block(self, text, font_size):
-        return self._detector.detect(LineData(text=text, font_size=font_size, is_bold=True))
+        return self._detector.detect(
+            LineData(text=text, font_size=font_size, is_bold=True)
+        )
 
     def save_xml_entry(self, block_name, text):
         with open(self.output_xml_path, "a", encoding="utf-8") as file:
             file.write(f"{serialize_block(BlockContent(name=block_name, text=text))}\n")
 
     def process(self):
-        self._processor.process(self.pdf_paths, self.output_xml_path, self.doc_type_path)
+        self._processor.process(
+            self.pdf_paths, self.output_xml_path, self.doc_type_path
+        )
         print(f"Final XML saved to: {self.output_xml_path}")
 
     def detectar_bloco(self, texto, fonte):

@@ -1,5 +1,11 @@
 import json
-from pdf_reader.application.generate_doc_type import build_doc_type, create_block, create_doc_type, save_json
+from pdf_reader.application.generate_doc_type import (
+    build_doc_type,
+    create_block,
+    create_doc_type,
+    save_json,
+)
+
 
 def test_create_block_fields():
     name, block = create_block("Title", match=[r"^title"], minimum_font_size=12)
