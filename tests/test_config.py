@@ -135,6 +135,9 @@ def test_load_runtime_config_expands_env_placeholders(tmp_path, monkeypatch):
     monkeypatch.setenv("TEST_INPUT_DIR", "./placeholder-input")
     monkeypatch.setenv("TEST_OUTPUT_DIR", "./placeholder-output")
 
+    for key in ("PDF_READER_INPUT_DIR", "PDF_READER_OUTPUT_DIR"):
+        monkeypatch.delenv(key, raising=False)
+
     config_path = tmp_path / "config.json"
     config_path.write_text(
         """
