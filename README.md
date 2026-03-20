@@ -30,10 +30,12 @@ The project follows a layered package structure:
 - `pdf_reader.entrypoints`
   CLI-facing entrypoints for local execution
 
+This repository currently uses a layered architecture. The empty legacy `layers/` folder is not part of the runtime design.
+
 ### Processing Flow
 
-1. Load runtime configuration from `config.json`
-2. Load block-detection rules from `doc_type.json`
+1. Load runtime configuration from an explicit config file
+2. Load block-detection rules from the configured `doc_type.json`
 3. Extract lines from PDFs through the infrastructure extractor
 4. Classify lines into logical blocks in the domain layer
 5. Persist the final XML output
@@ -98,7 +100,73 @@ Update `config.json`:
 ### 3. Run the main processing flow
 
 ```powershell
-python -m pdf_reader.entrypoints.process_pdf
+python -m pdf_reader.entrypoints.process_pdf --config .\config.json
+```
+
+## Practical Example
+
+Create a simple local setup like this:
+
+```text
+input/
+  sample.pdf
+output/
+config.json
+doc_type.json
+```
+
+Example `config.json`:
+
+```json
+{
+  "input_dir": "./input",
+  "output_dir": "./output",
+  "processing": {
+    "output_file": "result.xml",
+    "doc_type_path": "./doc_type.json"
+  }
+}
+```
+
+Example `doc_type.json`:
+
+```json
+{
+  "estruturas": {
+    "blocos": {
+      "Titulo": {
+        "match": ["^titulo"],
+        "descricao_fonte_minima": 10
+      },
+      "Resumo": {
+        "match": ["^resumo"],
+        "descricao_fonte_minima": 10
+      }
+    },
+    "ignorar": ["Pagina", "Rodape"]
+  }
+}
+```
+
+Run:
+
+```powershell
+python -m pdf_reader.entrypoints.process_pdf --config .\config.json
+```
+
+Expected output file:
+
+```text
+output/result.xml
+```
+
+Example output:
+
+```xml
+<dados>
+  <Titulo>Titulo do documento</Titulo>
+  <Resumo>Resumo consolidado do conteudo extraido</Resumo>
+</dados>
 ```
 
 ## CLI Commands
@@ -106,32 +174,32 @@ python -m pdf_reader.entrypoints.process_pdf
 ### Process PDFs
 
 ```powershell
-python -m pdf_reader.entrypoints.process_pdf
+python -m pdf_reader.entrypoints.process_pdf --config .\config.json
 ```
 
 ### Generate `doc_type.json`
 
 ```powershell
-python -m pdf_reader.entrypoints.generate_doc_type
+python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
 ```
 
 ### Compare extraction outputs
 
 ```powershell
-python -m pdf_reader.entrypoints.compare_outputs
+python -m pdf_reader.entrypoints.compare_outputs --config .\config.json
 ```
 
 ### Clean output directory
 
 ```powershell
-python -m pdf_reader.entrypoints.cleanup_output
+python -m pdf_reader.entrypoints.cleanup_output --config .\config.json
 ```
 
 ## Configuration
 
 ### `config.json`
 
-Defines runtime input and output directories.
+Defines runtime input and output directories. Relative paths are resolved from the directory that contains the chosen config file.
 
 ### `doc_type.json`
 

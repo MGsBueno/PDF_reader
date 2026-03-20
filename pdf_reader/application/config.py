@@ -36,6 +36,12 @@ class RuntimeConfig:
     doc_type_generation: DocTypeGenerationConfig = field(default_factory=DocTypeGenerationConfig)
 
 
+def _resolve_path(base_dir: str, path: str) -> str:
+    if os.path.isabs(path):
+        return path
+    return os.path.abspath(os.path.join(base_dir, path))
+
+
 def _build_comparison_targets(raw_targets: list[dict] | None) -> list[ComparisonTarget]:
     if not raw_targets:
         # Example local execution targets. Override them in config.json to compare your own contexts.
@@ -81,4 +87,25 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
         return None
 
     with open(config_path, "r", encoding="utf-8") as file:
-        return build_runtime_config(json.load(file))
+        config = build_runtime_config(json.load(file))
+
+    base_dir = os.path.dirname(os.path.abspath(config_path))
+    return RuntimeConfig(
+        input_dir=_resolve_path(base_dir, config.input_dir),
+        output_dir=_resolve_path(base_dir, config.output_dir),
+        processing=ProcessingConfig(
+            output_file=config.processing.output_file,
+            doc_type_path=_resolve_path(base_dir, config.processing.doc_type_path),
+        ),
+        comparison=ComparisonConfig(
+            targets=[
+                ComparisonTarget(name=target.name, path=_resolve_path(base_dir, target.path))
+                for target in config.comparison.targets
+            ],
+            output_file=config.comparison.output_file,
+        ),
+        doc_type_generation=DocTypeGenerationConfig(
+            profile=config.doc_type_generation.profile,
+            output_path=_resolve_path(base_dir, config.doc_type_generation.output_path),
+        ),
+    )

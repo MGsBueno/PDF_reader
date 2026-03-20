@@ -1,9 +1,12 @@
 from pdf_reader.application.config import load_runtime_config
 from pdf_reader.application.generate_doc_type import build_doc_type, save_json
+from pdf_reader.entrypoints._cli import parse_config_path
 
 
 def main():
-    config = load_runtime_config("config.json")
+    # Exemplo de execucao:
+    # python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
+    config = load_runtime_config(parse_config_path())
     if not config:
         return
 
