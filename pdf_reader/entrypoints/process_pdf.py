@@ -6,7 +6,7 @@ from pdf_reader.entrypoints._cli import parse_config_path
 
 
 def main():
-    # Exemplo de execucao:
+    # Example execution:
     # python -m pdf_reader.entrypoints.process_pdf --config .\config.json
     config = load_runtime_config(parse_config_path())
     if not config:
@@ -16,7 +16,7 @@ def main():
     output_dir = config.output_dir
 
     if not os.path.exists(input_dir):
-        print(f"A pasta {input_dir} nao existe. Verifique o caminho.")
+        print(f"Directory {input_dir} does not exist. Check the path.")
         return
 
     if not os.path.exists(output_dir):
@@ -24,13 +24,13 @@ def main():
 
     pdf_files = collect_pdf_paths(input_dir)
     if not pdf_files:
-        print(f"Nenhum arquivo PDF encontrado na pasta {input_dir}.")
+        print(f"No PDF files were found in directory {input_dir}.")
         return
 
     output_xml_path = os.path.join(output_dir, config.processing.output_file)
     doc_type_path = config.processing.doc_type_path
 
-    print(f"Processando {len(pdf_files)} arquivos PDF...")
+    print(f"Processing {len(pdf_files)} PDF files...")
     processor = PdfBatchProcessor()
     run_processing_job(processor, pdf_files, output_xml_path, doc_type_path, "PyMuPDF")
 

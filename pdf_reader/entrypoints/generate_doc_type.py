@@ -4,7 +4,7 @@ from pdf_reader.entrypoints._cli import parse_config_path
 
 
 def main():
-    # Exemplo de execucao:
+    # Example execution:
     # python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
     config = load_runtime_config(parse_config_path())
     if not config:

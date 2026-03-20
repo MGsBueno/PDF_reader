@@ -13,15 +13,15 @@ class BlockDetector:
             return None
 
         text_lower = line.text.lower()
-        for block_name, rule in self._config.blocos.items():
+        for block_name, rule in self._config.blocks.items():
             for pattern in rule.match:
-                if re.match(pattern, text_lower, re.IGNORECASE) and line.font_size >= rule.descricao_fonte_minima:
+                if re.match(pattern, text_lower, re.IGNORECASE) and line.font_size >= rule.minimum_description_font_size:
                     return block_name
         return None
 
     def should_ignore(self, text: str) -> bool:
         text_lower = text.lower()
-        return any(text_lower.startswith(ignored.lower()) for ignored in self._config.ignorar)
+        return any(text_lower.startswith(ignored.lower()) for ignored in self._config.ignore)
 
 
 def build_xml_tag(block_name: str) -> str:

@@ -8,14 +8,18 @@ def load_json(path):
 
 
 def compare_jsons(json1, json2):
-    blocks1 = json1.get("blocos", [])
-    blocks2 = json2.get("blocos", [])
+    blocks1 = json1.get("blocks", json1.get("blocos", []))
+    blocks2 = json2.get("blocks", json2.get("blocos", []))
 
     if len(blocks1) != len(blocks2):
         return False
 
     for block1, block2 in zip(blocks1, blocks2):
-        if block1.get("titulo") != block2.get("titulo") or block1.get("texto") != block2.get("texto"):
+        left_title = block1.get("title", block1.get("titulo"))
+        right_title = block2.get("title", block2.get("titulo"))
+        left_text = block1.get("text", block1.get("texto"))
+        right_text = block2.get("text", block2.get("texto"))
+        if left_title != right_title or left_text != right_text:
             return False
 
     return True
@@ -46,9 +50,9 @@ def compare_folders(targets, output_path):
             if difference:
                 differences[file_name] = difference
         except Exception as error:
-            print(f"Erro ao comparar o arquivo {file_name}: {error}")
+            print(f"Error comparing file {file_name}: {error}")
 
-    result = {"pastas_com_diferenca": differences}
+    result = {"folders_with_differences": differences}
     with open(output_path, "w", encoding="utf-8") as output_file:
         json.dump(result, output_file, indent=4, sort_keys=True)
 

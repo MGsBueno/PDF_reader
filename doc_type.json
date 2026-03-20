@@ -1,37 +1,37 @@
 {
-  "estruturas": {
-    "blocos": {
-      "Titulo": {
-        "match": ["^titulo"],
-        "fonte_minima": 12,
-        "descricao_fonte_minima": 10
+  "structures": {
+    "blocks": {
+      "Title": {
+        "match": ["^title"],
+        "minimum_font_size": 12,
+        "minimum_description_font_size": 10
       },
-      "Subtitulo": {
-        "match": ["^subtitulo"],
-        "fonte_minima": 12,
-        "descricao_fonte_minima": 10
+      "Subtitle": {
+        "match": ["^subtitle"],
+        "minimum_font_size": 12,
+        "minimum_description_font_size": 10
       },
-      "Resumo": {
-        "match": ["^resumo"],
-        "fonte_minima": 12,
-        "descricao_fonte_minima": 10
+      "Summary": {
+        "match": ["^summary"],
+        "minimum_font_size": 12,
+        "minimum_description_font_size": 10
       },
-      "Detalhes": {
-        "match": ["^detalhes"],
-        "fonte_minima": 12,
-        "descricao_fonte_minima": 10
+      "Details": {
+        "match": ["^details"],
+        "minimum_font_size": 12,
+        "minimum_description_font_size": 10
       }
     },
-    "ignorar": [
-      "Pagina",
-      "Cabecalho",
-      "Rodape"
+    "ignore": [
+      "Page",
+      "Header",
+      "Footer"
     ],
-    "nomes_blocos": [
-      "Titulo",
-      "Subtitulo",
-      "Resumo",
-      "Detalhes"
+    "block_names": [
+      "Title",
+      "Subtitle",
+      "Summary",
+      "Details"
     ]
   }
 }

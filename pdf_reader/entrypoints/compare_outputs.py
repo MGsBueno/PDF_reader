@@ -6,7 +6,7 @@ from pdf_reader.entrypoints._cli import parse_config_path
 
 
 def main():
-    # Exemplo de execucao:
+    # Example execution:
     # python -m pdf_reader.entrypoints.compare_outputs --config .\config.json
     config = load_runtime_config(parse_config_path())
     if not config:
@@ -18,7 +18,7 @@ def main():
     ]
     output_path = os.path.join(config.output_dir, config.comparison.output_file)
     compare_folders(targets, output_path)
-    print("comparacao concluida!")
+    print("Comparison completed!")
 
 
 if __name__ == "__main__":

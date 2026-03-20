@@ -8,7 +8,7 @@ class XmlBlockWriter:
 
     def start_document(self) -> None:
         with open(self.output_path, "w", encoding="utf-8") as file:
-            file.write("<dados>\n")
+            file.write("<data>\n")
 
     def write_block(self, block: BlockContent) -> None:
         with open(self.output_path, "a", encoding="utf-8") as file:
@@ -16,4 +16,4 @@ class XmlBlockWriter:
 
     def finish_document(self) -> None:
         with open(self.output_path, "a", encoding="utf-8") as file:
-            file.write("</dados>\n")
+            file.write("</data>\n")

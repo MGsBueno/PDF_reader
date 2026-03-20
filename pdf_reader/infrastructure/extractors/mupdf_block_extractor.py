@@ -12,31 +12,40 @@ class MuPdfBlockExtractor:
         self._config = None
         self._detector = None
         self._processor = PdfBatchProcessor()
-        self.blocos_config = {}
-        self.ignorar_textos = set()
-        self.ordem_blocos = []
+        self.block_config = {}
+        self.ignored_texts = set()
+        self.block_order = []
         self.load_config()
 
     def load_config(self):
         self._config = JsonDocumentTypeConfigLoader().load(self.doc_type_path)
         self._detector = BlockDetector(self._config)
-        self.blocos_config = {
+        self.block_config = {
             block_name: {
                 "match": rule.match,
-                "descricao_fonte_minima": rule.descricao_fonte_minima,
+                "minimum_description_font_size": rule.minimum_description_font_size,
             }
-            for block_name, rule in self._config.blocos.items()
+            for block_name, rule in self._config.blocks.items()
         }
-        self.ignorar_textos = set(self._config.ignorar)
-        self.ordem_blocos = list(self.blocos_config.keys())
+        self.ignored_texts = set(self._config.ignore)
+        self.block_order = list(self.block_config.keys())
+
+    def detect_block(self, text, font_size):
+        return self._detector.detect(LineData(text=text, font_size=font_size, is_bold=True))
+
+    def save_xml_entry(self, block_name, text):
+        with open(self.output_xml_path, "a", encoding="utf-8") as file:
+            file.write(f"{serialize_block(BlockContent(name=block_name, text=text))}\n")
+
+    def process(self):
+        self._processor.process(self.pdf_paths, self.output_xml_path, self.doc_type_path)
+        print(f"Final XML saved to: {self.output_xml_path}")
 
     def detectar_bloco(self, texto, fonte):
-        return self._detector.detect(LineData(text=texto, font_size=fonte, is_bold=True))
+        return self.detect_block(texto, fonte)
 
     def salvar_entrada_xml(self, nome_bloco, texto):
-        with open(self.output_xml_path, "a", encoding="utf-8") as file:
-            file.write(f"{serialize_block(BlockContent(name=nome_bloco, text=texto))}\n")
+        self.save_xml_entry(nome_bloco, texto)
 
     def processar(self):
-        self._processor.process(self.pdf_paths, self.output_xml_path, self.doc_type_path)
-        print(f"XML final salvo em: {self.output_xml_path}")
+        self.process()

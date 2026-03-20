@@ -1,0 +1,134 @@
+Algorithm PDFBlockExtraction
+
+Input:
+    pdf_file_paths
+    output_xml_path
+    doc_type_config_path
+
+Output:
+    A single XML document containing the extracted logical blocks
+
+Function LoadDocumentTypeConfig(doc_type_config_path)
+    If doc_type_config_path does not exist
+        Return an empty document type configuration
+
+    Open the JSON file
+    Read the configured blocks and ignore rules
+    Return the document type configuration
+
+Function ExtractLinesFromPdf(pdf_file_path)
+    Open the PDF document
+    For each page in the document
+        Read page blocks as structured text
+        For each text block
+            If the block has no lines
+                Continue
+            For each line in the block
+                Join all spans into a single line of text
+                If the line is empty
+                    Continue
+                Collect:
+                    text
+                    maximum font size found in the line
+                    whether any span uses a bold font
+    Close the PDF document
+    Return the ordered list of extracted lines
+
+Function DetectBlock(line, document_type_config)
+    If the line is not bold
+        Return no block
+
+    For each configured block rule
+        For each regex pattern in the rule
+            If the line text matches the pattern
+               and the line font size is greater than or equal to the configured minimum
+                Return the block name
+
+    Return no block
+
+Function ShouldIgnore(line_text, document_type_config)
+    For each configured ignored prefix
+        If line_text starts with the ignored prefix
+            Return true
+    Return false
+
+Function ProcessPdfFiles(pdf_file_paths, output_xml_path, doc_type_config_path)
+    document_type_config <- LoadDocumentTypeConfig(doc_type_config_path)
+    Start XML document with root tag <dados>
+
+    For each pdf_file_path in pdf_file_paths
+        current_block_name <- null
+        current_block_text <- empty string
+        lines <- ExtractLinesFromPdf(pdf_file_path)
+
+        For each line in lines
+            If ShouldIgnore(line.text, document_type_config)
+                If current_block_name is not null
+                    Write current block to XML
+                    current_block_name <- null
+                    current_block_text <- empty string
+                Continue
+
+            detected_block_name <- DetectBlock(line, document_type_config)
+
+            If detected_block_name exists
+                If current_block_name is not null
+                    Write current block to XML
+                current_block_name <- detected_block_name
+                current_block_text <- line.text
+                Continue
+
+            If current_block_name is not null
+                Append line.text to current_block_text
+
+        If current_block_name is not null
+            Write current block to XML
+
+    Finish XML document with closing tag </dados>
+
+Cost Study
+
+Definitions:
+    P <- number of PDF files
+    L <- total number of extracted lines across all PDF files
+    B <- number of configured block types
+    R <- average number of regex patterns per block
+    I <- number of configured ignored prefixes
+    S <- total number of parsed spans
+
+Time Cost:
+    Loading the JSON configuration:
+        O(B * R + I)
+    Extracting lines from PDFs:
+        O(S)
+    Ignoring checks for all lines:
+        O(L * I)
+    Block detection for all lines in the worst case:
+        O(L * B * R)
+    XML writing for all detected content:
+        O(L)
+    Total worst-case time cost:
+        O(S + L * I + L * B * R)
+
+Special Cases:
+    If B and R are treated as constants:
+        O(S + L)
+    If the number of rules grows proportionally with the number of lines:
+        O(L^2)
+
+Memory Cost:
+    Configuration in memory:
+        O(B * R + I)
+    Extracted lines kept in memory for one PDF:
+        O(M)
+    Current block accumulation:
+        O(M) in the worst case
+    Total memory cost:
+        O(M + B * R + I)
+
+Practical Notes:
+    Increasing the number of block rules or regex patterns increases detection time
+    Very large PDFs increase extraction time and temporary memory use
+    Writing XML incrementally helps keep output memory cost low
+    If needed, memory usage can be reduced further by streaming extracted lines instead of storing all lines first
+

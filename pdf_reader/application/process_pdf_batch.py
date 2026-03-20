@@ -68,5 +68,5 @@ def run_processing_job(
     start_time = time.time()
     processor.process(pdf_paths, output_xml_path, doc_type_path)
     elapsed_time = time.time() - start_time
-    print(f"Processamento concluido com {method_name}.")
-    print(f"Tempo de execucao de {method_name}: {elapsed_time:.2f} segundos.")
+    print(f"Processing completed with {method_name}.")
+    print(f"Execution time for {method_name}: {elapsed_time:.2f} seconds.")
