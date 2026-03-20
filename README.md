@@ -1,71 +1,82 @@
-# PDF Reader - Processamento de PDFs com Diferentes Métodos
+# PDF Reader
 
-## Descrição
+Structured PDF extraction pipeline for block-based document parsing.
 
-Este projeto permite a extração de texto de arquivos PDF. Na primeira etapa utiliza diferentes bibliotecas de processamento em Python. Atualmente utilizando PdfPlumber, PyMuPDF e PdfMiner gera resultados de forma estruturada e compara seus tempos de execuçao no prompt.
+## Overview
 
-## Estrutura dos Arquivos
+`PDF Reader` processes PDF files, detects logical content blocks based on configurable rules, and writes the extracted result to XML.
 
-### Scripts Principais
+The current implementation is built around `PyMuPDF` and a layered internal package designed to keep domain rules, application workflows, infrastructure adapters, and CLI entrypoints separated.
 
-- **`valida.py`**: Script responsável pela comparação dos PDFs processados.
-- **`Save.py`**: Gerencia o salvamento dos resultados extraídos.
-- **`delete.py`**: Script responsável por limpar o diretorio de saída.
+## Key Capabilities
 
-### Métodos de Extração
+- Extract text lines from PDF documents using `PyMuPDF`
+- Detect semantic blocks using regex and font-based rules from `doc_type.json`
+- Serialize extracted blocks into a consolidated XML output
+- Generate default document-type configuration
+- Compare outputs across extraction strategies
+- Clean generated output artifacts
 
-- **`MyPdfPlumber.py`**: Implementação do método de extração usando a biblioteca PdfPlumber.
-- **`MyPdfMuPDF.py`**: Implementação do método de extração usando a biblioteca PyMuPDF.
-- **`MyPdfMiner.py`**: Implementação do método de extração usando a biblioteca PdfMiner.
+## Architecture
 
-### Arquivos Auxiliares
+The project follows a layered package structure:
 
-- **`algoritmo.txt`**: Documento contendo o fluxo ou explicação do algoritmo utilizado.
-- **`config.json`**: Arquivo de configuração que define diretórios de entrada e saída.
+- `pdf_reader.domain`
+  Core models and domain rules
+- `pdf_reader.application`
+  Use cases and application services
+- `pdf_reader.infrastructure`
+  Adapters for config loading, PDF extraction, and XML writing
+- `pdf_reader.entrypoints`
+  CLI-facing entrypoints for local execution
 
-## Como Usar
+### Processing Flow
 
-1. **Configurar o ambiente:**
+1. Load runtime configuration from `config.json`
+2. Load block-detection rules from `doc_type.json`
+3. Extract lines from PDFs through the infrastructure extractor
+4. Classify lines into logical blocks in the domain layer
+5. Persist the final XML output
 
-   - Certifique-se de ter o Python instalado em sua máquina.
-   - Instale as bibliotecas necessárias executando:
+## Repository Layout
 
-     ```bash
-     pip install pdfplumber pymupdf pdfminer.six
-     ```
-
-2. **Configurar os diretórios:**
-
-   - Edite o arquivo `config.json` para definir os caminhos de entrada e saída:
-
-     ```json
-     {
-       "input_dir": "caminho/para/diretorio/de/entrada",
-       "output_dir": "caminho/para/diretorio/de/saida"
-     }
-     ```
-
-3. **Executar o processamento:**
-
-   - Execute o script principal que faz a chamada dos métodos desejados:
-
-     ```bash
-     python save.py
-     ```
-
-   - Os resultados serão armazenados em diretórios organizados pelo nome de cada arquivo e internamente por método de extração.
-
-## Dependências
-
-Certifique-se de instalar as bibliotecas necessárias antes de executar os scripts:
-
-```bash
-pip install pdfplumber pymupdf pdfminer.six
+```text
+pdf_reader/
+  application/
+    cleanup_output.py
+    compare_outputs.py
+    config.py
+    generate_doc_type.py
+    process_pdf_batch.py
+  domain/
+    models.py
+    services.py
+  entrypoints/
+    cleanup_output.py
+    compare_outputs.py
+    generate_doc_type.py
+    process_pdf.py
+  infrastructure/
+    config_loader.py
+    extractors/
+      mupdf_block_extractor.py
+      pymupdf_extractor.py
+    writers/
+      xml_writer.py
+tests/
+config.json
+doc_type.json
+requirements.txt
+requirements-dev.txt
 ```
 
-## Ambiente Virtual
+## Requirements
 
-Para criar e ativar um ambiente virtual no Windows PowerShell:
+- Python 3.12+
+
+## Quickstart
+
+### 1. Create a virtual environment
 
 ```powershell
 python -m venv .venv
@@ -73,10 +84,78 @@ python -m venv .venv
 pip install -r requirements-dev.txt
 ```
 
-## Testes
+### 2. Configure input and output paths
 
-Para executar a suíte de testes:
+Update `config.json`:
+
+```json
+{
+  "input_dir": "caminho/para/entrada",
+  "output_dir": "caminho/para/saida"
+}
+```
+
+### 3. Run the main processing flow
+
+```powershell
+python -m pdf_reader.entrypoints.process_pdf
+```
+
+## CLI Commands
+
+### Process PDFs
+
+```powershell
+python -m pdf_reader.entrypoints.process_pdf
+```
+
+### Generate `doc_type.json`
+
+```powershell
+python -m pdf_reader.entrypoints.generate_doc_type
+```
+
+### Compare extraction outputs
+
+```powershell
+python -m pdf_reader.entrypoints.compare_outputs
+```
+
+### Clean output directory
+
+```powershell
+python -m pdf_reader.entrypoints.cleanup_output
+```
+
+## Configuration
+
+### `config.json`
+
+Defines runtime input and output directories.
+
+### `doc_type.json`
+
+Defines:
+
+- block names
+- regex match rules
+- minimum font thresholds
+- ignored text prefixes
+
+## Development
+
+### Run tests
 
 ```powershell
 python -m pytest -q tests
 ```
+
+### Install runtime dependencies only
+
+```powershell
+pip install -r requirements.txt
+```
+
+## Status
+
+This repository is currently in pre-release and the internal architecture is still evolving. The public structure should be considered unstable until the first stable release.
