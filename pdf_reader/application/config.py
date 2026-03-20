@@ -174,9 +174,7 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
     if not isinstance(raw_data, dict):
         raise ValueError("Configuration file must contain a JSON object")
 
-    config = build_runtime_config(
-        _apply_env_overrides(cast(dict[str, Any], raw_data))
-    )
+    config = build_runtime_config(_apply_env_overrides(cast(dict[str, Any], raw_data)))
 
     return RuntimeConfig(
         input_dir=_resolve_path(base_dir, config.input_dir),
