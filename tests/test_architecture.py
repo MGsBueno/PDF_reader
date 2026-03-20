@@ -53,4 +53,3 @@ def test_pdf_batch_processor_uses_layers(tmp_path):
     assert "<data>" in content
     assert "<Title>Title Main complementary line</Title>" in content
     assert "</data>" in content
-

@@ -17,4 +17,3 @@ class XmlBlockWriter:
     def finish_document(self) -> None:
         with open(self.output_path, "a", encoding="utf-8") as file:
             file.write("</data>\n")
-

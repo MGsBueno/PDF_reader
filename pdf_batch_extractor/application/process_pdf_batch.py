@@ -89,4 +89,3 @@ def run_processing_job(
     elapsed_time = time.time() - start_time
     print(f"Processing completed with {method_name}.")
     print(f"Execution time for {method_name}: {elapsed_time:.2f} seconds.")
-

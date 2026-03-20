@@ -38,4 +38,3 @@ def test_build_doc_type_uses_generic_profile_by_name():
     assert "structures" in doc_type
     assert "Title" in doc_type["structures"]["blocks"]
     assert doc_type["structures"]["ignore"] == ["Page", "Header", "Footer"]
-

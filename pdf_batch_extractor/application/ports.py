@@ -22,4 +22,3 @@ class BlockWriter(Protocol):
 
 BlockWriterFactory = Callable[[str], BlockWriter]
 PdfPathCollection = Iterable[str]
-

@@ -39,4 +39,3 @@ def serialize_block(block: BlockContent) -> str:
     tag = build_xml_tag(block.name)
     escaped_text = escape(block.text.strip())
     return f"  <{tag}>{escaped_text}</{tag}>"
-

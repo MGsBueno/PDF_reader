@@ -197,4 +197,3 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
             output_path=_resolve_path(base_dir, config.doc_type_generation.output_path),
         ),
     )
-

@@ -66,4 +66,3 @@ class JsonDocumentTypeConfigLoader:
             match=match,
             minimum_description_font_size=float(minimum_description_font_size),
         )
-

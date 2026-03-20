@@ -3,7 +3,9 @@ import warnings
 from pdf_batch_extractor.bootstrap import create_pdf_batch_processor
 from pdf_batch_extractor.domain.models import BlockContent, LineData
 from pdf_batch_extractor.domain.services import BlockDetector, serialize_block
-from pdf_batch_extractor.infrastructure.config_loader import JsonDocumentTypeConfigLoader
+from pdf_batch_extractor.infrastructure.config_loader import (
+    JsonDocumentTypeConfigLoader,
+)
 
 
 class MuPdfBlockExtractor:
@@ -66,4 +68,3 @@ class MuPdfBlockExtractor:
 
     def processar(self):
         self.process()
-

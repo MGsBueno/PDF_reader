@@ -1,5 +1,10 @@
-from pdf_batch_extractor.application.config import build_runtime_config, load_runtime_config
-from pdf_batch_extractor.infrastructure.config_loader import JsonDocumentTypeConfigLoader
+from pdf_batch_extractor.application.config import (
+    build_runtime_config,
+    load_runtime_config,
+)
+from pdf_batch_extractor.infrastructure.config_loader import (
+    JsonDocumentTypeConfigLoader,
+)
 
 
 def test_build_runtime_config_uses_explicit_values():
@@ -200,4 +205,3 @@ def test_document_type_config_loader_rejects_portuguese_keys(tmp_path):
         assert False, "Expected ValueError for Portuguese keys"
     except ValueError as error:
         assert "no longer supported" in str(error)
-
