@@ -1,7 +1,7 @@
 from collections.abc import Callable, Iterable
 from typing import Protocol
 
-from pdf_reader.domain.models import BlockContent, DocumentTypeConfig, LineData
+from pdf_batch_extractor.domain.models import BlockContent, DocumentTypeConfig, LineData
 
 
 class LineExtractor(Protocol):
@@ -22,3 +22,4 @@ class BlockWriter(Protocol):
 
 BlockWriterFactory = Callable[[str], BlockWriter]
 PdfPathCollection = Iterable[str]
+

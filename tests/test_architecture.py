@@ -1,5 +1,5 @@
-from pdf_reader.application.process_pdf_batch import PdfBatchProcessor
-from pdf_reader.domain.models import LineData
+from pdf_batch_extractor.application.process_pdf_batch import PdfBatchProcessor
+from pdf_batch_extractor.domain.models import LineData
 
 
 class FakeExtractor:
@@ -13,7 +13,7 @@ class FakeExtractor:
 
 class FakeConfigLoader:
     def load(self, doc_type_path: str):
-        from pdf_reader.domain.models import BlockRule, DocumentTypeConfig
+        from pdf_batch_extractor.domain.models import BlockRule, DocumentTypeConfig
 
         return DocumentTypeConfig(
             blocks={
@@ -53,3 +53,4 @@ def test_pdf_batch_processor_uses_layers(tmp_path):
     assert "<data>" in content
     assert "<Title>Title Main complementary line</Title>" in content
     assert "</data>" in content
+

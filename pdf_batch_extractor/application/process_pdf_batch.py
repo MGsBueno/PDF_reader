@@ -1,9 +1,9 @@
 import os
 import time
 
-from pdf_reader.domain.models import BlockContent
-from pdf_reader.domain.services import BlockDetector
-from pdf_reader.application.ports import (
+from pdf_batch_extractor.domain.models import BlockContent
+from pdf_batch_extractor.domain.services import BlockDetector
+from pdf_batch_extractor.application.ports import (
     BlockWriter,
     BlockWriterFactory,
     DocumentTypeConfigLoader,
@@ -89,3 +89,4 @@ def run_processing_job(
     elapsed_time = time.time() - start_time
     print(f"Processing completed with {method_name}.")
     print(f"Execution time for {method_name}: {elapsed_time:.2f} seconds.")
+

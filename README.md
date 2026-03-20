@@ -1,140 +1,109 @@
-# PDF Reader
+# PDF Batch Extractor
 
 Structured PDF extraction pipeline for block-based document parsing.
 
-## Overview
+This project provides a configurable and extensible system to extract structured data from PDFs and transform it into XML using a block-based approach.
 
-`PDF Reader` processes PDF files, detects logical content blocks based on configurable rules, and writes the extracted result to XML.
+---
 
-The current implementation is built around `PyMuPDF` and a layered internal package designed to keep domain rules, application workflows, infrastructure adapters, and CLI entrypoints separated.
+## Features
 
-## Key Capabilities
+- Block-based PDF parsing using **PyMuPDF**
+- Configurable extraction via `doc_type.json`
+- XML output generation
+- CLI-based execution
+- Layered architecture (domain, application, infrastructure)
+- Composition root for dependency wiring
+- Automated tests with `pytest`
+- Code quality enforcement:
+  - `black` (formatting)
+  - `flake8` (linting)
+  - `mypy` (type checking)
+- CI pipeline with GitHub Actions
 
-- Extract text lines from PDF documents using `PyMuPDF`
-- Detect semantic blocks using regex and font-based rules from `doc_type.json`
-- Serialize extracted blocks into a consolidated XML output
-- Generate default document-type configuration
-- Compare outputs across extraction strategies
-- Clean generated output artifacts
+---
 
 ## Architecture
 
-The project follows a layered package structure:
-
-- `pdf_reader.domain`
-  Core models and domain rules
-- `pdf_reader.application`
-  Use cases and application services
-- `pdf_reader.infrastructure`
-  Adapters for config loading, PDF extraction, and XML writing
-- `pdf_reader.entrypoints`
-  CLI-facing entrypoints for local execution
-
-This repository currently uses a layered architecture with a small composition root. The empty legacy `layers/` folder is not part of the runtime design.
-
-### Processing Flow
-
-1. Load runtime configuration from an explicit config file
-2. Load block-detection rules from the configured `doc_type.json`
-3. Compose concrete adapters in the bootstrap/composition root
-4. Extract lines from PDFs through the infrastructure extractor
-5. Classify lines into logical blocks in the domain layer
-6. Persist the final XML output
-
-## Repository Layout
+The project follows a **layered architecture**:
 
 ```text
-pdf_reader/
-  bootstrap.py
-  application/
-    cleanup_output.py
-    compare_outputs.py
-    config.py
-    ports.py
-    generate_doc_type.py
-    process_pdf_batch.py
-  domain/
-    models.py
-    services.py
-  entrypoints/
-    cleanup_output.py
-    compare_outputs.py
-    generate_doc_type.py
-    process_pdf.py
-  infrastructure/
-    config_loader.py
-    extractors/
-      mupdf_block_extractor.py
-      pymupdf_extractor.py
-    writers/
-      xml_writer.py
-tests/
-.env.example
-Algorithm.txt
-config.json
-doc_type.json
-requirements.txt
-requirements-dev.txt
+pdf_batch_extractor/
+  domain/           # Core models and business rules
+  application/      # Use cases and orchestration
+  infrastructure/   # External adapters (PDF, config, XML)
+  entrypoints/      # CLI interfaces
+  bootstrap.py      # Composition root
 ```
 
-## Requirements
+### Design Principles
 
-- Python 3.12+
+- Separation of concerns
+- Dependency inversion via ports
+- Config-driven behavior
+- Testable components
 
-## Quickstart
+---
 
-### 1. Create a virtual environment
+## Installation
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+### Option 1 - Editable (recommended for development)
+
+```bash
+pip install -e .
+```
+
+### Option 2 - Standard
+
+```bash
+pip install .
+```
+
+---
+
+## Development Setup
+
+```bash
+pip install -r requirements.txt
 pip install -r requirements-dev.txt
 pip install -e .
 ```
 
-### 2. Configure input and output paths
+---
 
-You can configure the project with `config.json`, `.env`, or both.
+## Usage
 
-Example `.env`:
+### Process PDFs
 
-```dotenv
-PDF_READER_INPUT_DIR=./input
-PDF_READER_OUTPUT_DIR=./output
-PDF_READER_OUTPUT_FILE=result.xml
-PDF_READER_DOC_TYPE_PATH=./doc_type.json
+```bash
+pdf-batch-extractor --config config.json
 ```
 
-You can start by copying `.env.example` to `.env`.
+### Generate document type configuration
 
-Then update `config.json` if you want extra settings:
-
-```json
-{
-  "input_dir": "caminho/para/entrada",
-  "output_dir": "caminho/para/saida"
-}
+```bash
+pdf-batch-extractor-generate-doc-type
 ```
 
-### 3. Run the main processing flow
+### Compare outputs
 
-```powershell
-python -m pdf_reader.entrypoints.process_pdf --config .\config.json
+```bash
+pdf-batch-extractor-compare-outputs
 ```
 
-## Practical Example
+### Cleanup output directory
 
-Create a simple local setup like this:
-
-```text
-input/
-  sample.pdf
-output/
-config.json
-doc_type.json
+```bash
+pdf-batch-extractor-cleanup-output
 ```
 
-Example `config.json`:
+---
+
+## Configuration
+
+### `config.json`
+
+Controls runtime behavior:
 
 ```json
 {
@@ -142,154 +111,91 @@ Example `config.json`:
   "output_dir": "./output",
   "processing": {
     "output_file": "result.xml",
-    "doc_type_path": "./doc_type.json"
+    "doc_type_path": "doc_type.json"
   }
 }
 ```
 
-Example `doc_type.json`:
+---
+
+### `doc_type.json`
+
+Defines how blocks are extracted:
 
 ```json
 {
   "structures": {
     "blocks": {
       "Title": {
-        "match": ["^title"],
-        "minimum_description_font_size": 10
-      },
-      "Summary": {
-        "match": ["^summary"],
-        "minimum_description_font_size": 10
+        "match": ["^Title"],
+        "minimum_description_font_size": 12
       }
     },
-    "ignore": ["Page", "Footer"]
+    "ignore": ["Page", "Header", "Footer"]
   }
 }
 ```
 
-Run:
+---
 
-```powershell
-python -m pdf_reader.entrypoints.process_pdf --config .\config.json
+## Testing
+
+```bash
+pytest -q
 ```
 
-Expected output file:
+---
+
+## Code Quality
+
+```bash
+flake8 .
+black --check .
+mypy .
+```
+
+---
+
+## CI Pipeline
+
+The project uses GitHub Actions to ensure:
+
+- Tests execution
+- Code formatting validation
+- Linting checks
+- Static type checking
+
+All checks must pass before merging into `main`.
+
+---
+
+## Example Flow
 
 ```text
-output/result.xml
+PDF input -> Line extraction -> Block detection -> XML output
 ```
 
-Example output:
+---
 
-```xml
-<data>
-  <Title>Document title</Title>
-  <Summary>Consolidated summary of the extracted content</Summary>
-</data>
-```
+## Project Status
 
-## CLI Commands
+**Development Status:** Pre-Alpha
 
-### Process PDFs
+The project is under active development and subject to changes.
 
-```powershell
-python -m pdf_reader.entrypoints.process_pdf --config .\config.json
-```
+---
 
-Installed CLI:
+## Motivation
 
-```powershell
-pdf-reader --config .\config.json
-pdf-reader-process --config .\config.json
-```
+This project was designed to:
 
-### Generate `doc_type.json`
+- Explore clean architecture in Python
+- Build a configurable document parsing system
+- Improve maintainability and extensibility of PDF extraction pipelines
 
-```powershell
-python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
-```
+---
 
-Installed CLI:
+## License
 
-```powershell
-pdf-reader-generate-doc-type --config .\config.json
-```
+MIT License
 
-### Compare extraction outputs
-
-```powershell
-python -m pdf_reader.entrypoints.compare_outputs --config .\config.json
-```
-
-Installed CLI:
-
-```powershell
-pdf-reader-compare-outputs --config .\config.json
-```
-
-### Clean output directory
-
-```powershell
-python -m pdf_reader.entrypoints.cleanup_output --config .\config.json
-```
-
-Installed CLI:
-
-```powershell
-pdf-reader-cleanup-output --config .\config.json
-```
-
-## Configuration
-
-### `config.json`
-
-Defines runtime input and output directories. Relative paths are resolved from the directory that contains the chosen config file.
-
-### `.env`
-
-If a `.env` file exists in the same directory as `config.json`, it is loaded automatically before the runtime config is built.
-
-Supported variables:
-
-- `PDF_READER_INPUT_DIR`
-- `PDF_READER_OUTPUT_DIR`
-- `PDF_READER_OUTPUT_FILE`
-- `PDF_READER_DOC_TYPE_PATH`
-- `PDF_READER_COMPARISON_OUTPUT_FILE`
-- `PDF_READER_DOC_TYPE_PROFILE`
-- `PDF_READER_DOC_TYPE_OUTPUT_PATH`
-
-You can also reference environment variables inside `config.json` with `${VAR_NAME}` syntax.
-
-### `doc_type.json`
-
-Defines:
-
-- block names
-- regex match rules
-- minimum font thresholds
-- ignored text prefixes
-
-The supported schema is now strict and uses the English keys `structures`, `blocks`, `ignore`, and `minimum_description_font_size`.
-
-### Legacy compatibility
-
-`MuPdfBlockExtractor` is kept only as a legacy compatibility wrapper. New integrations should use the main `PdfBatchProcessor` flow through the composition root in `pdf_reader/bootstrap.py`.
-
-## Development
-
-### Run tests
-
-```powershell
-python -m pytest -q tests
-```
-
-### Install runtime dependencies only
-
-```powershell
-pip install -r requirements.txt
-```
-
-## Status
-
-This repository is currently in pre-release and the internal architecture is still evolving. The public structure should be considered unstable until the first stable release.

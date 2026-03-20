@@ -1,5 +1,5 @@
-from pdf_reader.domain.models import BlockContent
-from pdf_reader.domain.services import serialize_block
+from pdf_batch_extractor.domain.models import BlockContent
+from pdf_batch_extractor.domain.services import serialize_block
 
 
 class XmlBlockWriter:
@@ -17,3 +17,4 @@ class XmlBlockWriter:
     def finish_document(self) -> None:
         with open(self.output_path, "a", encoding="utf-8") as file:
             file.write("</data>\n")
+

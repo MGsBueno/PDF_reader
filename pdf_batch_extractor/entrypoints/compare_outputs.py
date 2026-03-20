@@ -1,13 +1,13 @@
 import os
 
-from pdf_reader.application.compare_outputs import compare_folders
-from pdf_reader.application.config import ComparisonTarget, load_runtime_config
-from pdf_reader.entrypoints._cli import parse_config_path
+from pdf_batch_extractor.application.compare_outputs import compare_folders
+from pdf_batch_extractor.application.config import ComparisonTarget, load_runtime_config
+from pdf_batch_extractor.entrypoints._cli import parse_config_path
 
 
 def main():
     # Example execution:
-    # python -m pdf_reader.entrypoints.compare_outputs --config .\config.json
+    # python -m pdf_batch_extractor.entrypoints.compare_outputs --config .\config.json
     config = load_runtime_config(parse_config_path())
     if not config:
         return
@@ -23,3 +23,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

@@ -1,6 +1,6 @@
 import json
 
-from pdf_reader.domain.models import BlockRule, DocumentTypeConfig
+from pdf_batch_extractor.domain.models import BlockRule, DocumentTypeConfig
 
 
 class JsonDocumentTypeConfigLoader:
@@ -66,3 +66,4 @@ class JsonDocumentTypeConfigLoader:
             match=match,
             minimum_description_font_size=float(minimum_description_font_size),
         )
+

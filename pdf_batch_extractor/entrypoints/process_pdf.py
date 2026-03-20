@@ -1,17 +1,17 @@
 import os
 
-from pdf_reader.application.config import load_runtime_config
-from pdf_reader.application.process_pdf_batch import (
+from pdf_batch_extractor.application.config import load_runtime_config
+from pdf_batch_extractor.application.process_pdf_batch import (
     collect_pdf_paths,
     run_processing_job,
 )
-from pdf_reader.bootstrap import create_pdf_batch_processor
-from pdf_reader.entrypoints._cli import parse_config_path
+from pdf_batch_extractor.bootstrap import create_pdf_batch_processor
+from pdf_batch_extractor.entrypoints._cli import parse_config_path
 
 
 def main():
     # Example execution:
-    # python -m pdf_reader.entrypoints.process_pdf --config .\config.json
+    # python -m pdf_batch_extractor.entrypoints.process_pdf --config .\config.json
     config = load_runtime_config(parse_config_path())
     if not config:
         return
@@ -41,3 +41,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+

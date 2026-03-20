@@ -2,22 +2,30 @@
   "structures": {
     "blocks": {
       "Title": {
-        "match": ["^title"],
+        "match": [
+          "^title"
+        ],
         "minimum_font_size": 12,
         "minimum_description_font_size": 10
       },
       "Subtitle": {
-        "match": ["^subtitle"],
+        "match": [
+          "^subtitle"
+        ],
         "minimum_font_size": 12,
         "minimum_description_font_size": 10
       },
       "Summary": {
-        "match": ["^summary"],
+        "match": [
+          "^summary"
+        ],
         "minimum_font_size": 12,
         "minimum_description_font_size": 10
       },
       "Details": {
-        "match": ["^details"],
+        "match": [
+          "^details"
+        ],
         "minimum_font_size": 12,
         "minimum_description_font_size": 10
       }

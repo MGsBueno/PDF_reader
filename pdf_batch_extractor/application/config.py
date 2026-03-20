@@ -80,32 +80,32 @@ def _apply_env_overrides(data: dict[str, Any]) -> dict[str, Any]:
     doc_type_generation_data = dict(runtime_data.get("doc_type_generation", {}))
 
     runtime_data["input_dir"] = _env_or_value(
-        "PDF_READER_INPUT_DIR", runtime_data.get("input_dir", "./input")
+        "PDF_BATCH_EXTRACTOR_INPUT_DIR", runtime_data.get("input_dir", "./input")
     )
     runtime_data["output_dir"] = _env_or_value(
-        "PDF_READER_OUTPUT_DIR", runtime_data.get("output_dir", "./output")
+        "PDF_BATCH_EXTRACTOR_OUTPUT_DIR", runtime_data.get("output_dir", "./output")
     )
 
     processing_data["output_file"] = _env_or_value(
-        "PDF_READER_OUTPUT_FILE",
+        "PDF_BATCH_EXTRACTOR_OUTPUT_FILE",
         processing_data.get("output_file", "result.xml"),
     )
     processing_data["doc_type_path"] = _env_or_value(
-        "PDF_READER_DOC_TYPE_PATH",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_PATH",
         processing_data.get("doc_type_path", "doc_type.json"),
     )
 
     comparison_data["output_file"] = _env_or_value(
-        "PDF_READER_COMPARISON_OUTPUT_FILE",
+        "PDF_BATCH_EXTRACTOR_COMPARISON_OUTPUT_FILE",
         comparison_data.get("output_file", "differences.json"),
     )
 
     doc_type_generation_data["profile"] = _env_or_value(
-        "PDF_READER_DOC_TYPE_PROFILE",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_PROFILE",
         doc_type_generation_data.get("profile", "generic_example"),
     )
     doc_type_generation_data["output_path"] = _env_or_value(
-        "PDF_READER_DOC_TYPE_OUTPUT_PATH",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_OUTPUT_PATH",
         doc_type_generation_data.get("output_path", "doc_type.json"),
     )
 
@@ -197,3 +197,4 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
             output_path=_resolve_path(base_dir, config.doc_type_generation.output_path),
         ),
     )
+

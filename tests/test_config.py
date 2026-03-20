@@ -1,5 +1,5 @@
-from pdf_reader.application.config import build_runtime_config, load_runtime_config
-from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
+from pdf_batch_extractor.application.config import build_runtime_config, load_runtime_config
+from pdf_batch_extractor.infrastructure.config_loader import JsonDocumentTypeConfigLoader
 
 
 def test_build_runtime_config_uses_explicit_values():
@@ -106,23 +106,23 @@ def test_load_runtime_config_uses_dotenv_overrides(tmp_path, monkeypatch):
     )
     (tmp_path / ".env").write_text(
         """
-PDF_READER_INPUT_DIR=./env-input
-PDF_READER_OUTPUT_DIR=./env-output
-PDF_READER_OUTPUT_FILE=env-result.xml
-PDF_READER_DOC_TYPE_PATH=./schemas/env-doc-type.json
-PDF_READER_DOC_TYPE_PROFILE=structured_report_example
-PDF_READER_DOC_TYPE_OUTPUT_PATH=./generated/env-doc-type.json
+PDF_BATCH_EXTRACTOR_INPUT_DIR=./env-input
+PDF_BATCH_EXTRACTOR_OUTPUT_DIR=./env-output
+PDF_BATCH_EXTRACTOR_OUTPUT_FILE=env-result.xml
+PDF_BATCH_EXTRACTOR_DOC_TYPE_PATH=./schemas/env-doc-type.json
+PDF_BATCH_EXTRACTOR_DOC_TYPE_PROFILE=structured_report_example
+PDF_BATCH_EXTRACTOR_DOC_TYPE_OUTPUT_PATH=./generated/env-doc-type.json
         """.strip(),
         encoding="utf-8",
     )
 
     for key in (
-        "PDF_READER_INPUT_DIR",
-        "PDF_READER_OUTPUT_DIR",
-        "PDF_READER_OUTPUT_FILE",
-        "PDF_READER_DOC_TYPE_PATH",
-        "PDF_READER_DOC_TYPE_PROFILE",
-        "PDF_READER_DOC_TYPE_OUTPUT_PATH",
+        "PDF_BATCH_EXTRACTOR_INPUT_DIR",
+        "PDF_BATCH_EXTRACTOR_OUTPUT_DIR",
+        "PDF_BATCH_EXTRACTOR_OUTPUT_FILE",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_PATH",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_PROFILE",
+        "PDF_BATCH_EXTRACTOR_DOC_TYPE_OUTPUT_PATH",
     ):
         monkeypatch.delenv(key, raising=False)
 
@@ -145,7 +145,7 @@ def test_load_runtime_config_expands_env_placeholders(tmp_path, monkeypatch):
     monkeypatch.setenv("TEST_INPUT_DIR", "./placeholder-input")
     monkeypatch.setenv("TEST_OUTPUT_DIR", "./placeholder-output")
 
-    for key in ("PDF_READER_INPUT_DIR", "PDF_READER_OUTPUT_DIR"):
+    for key in ("PDF_BATCH_EXTRACTOR_INPUT_DIR", "PDF_BATCH_EXTRACTOR_OUTPUT_DIR"):
         monkeypatch.delenv(key, raising=False)
 
     config_path = tmp_path / "config.json"
@@ -200,3 +200,4 @@ def test_document_type_config_loader_rejects_portuguese_keys(tmp_path):
         assert False, "Expected ValueError for Portuguese keys"
     except ValueError as error:
         assert "no longer supported" in str(error)
+

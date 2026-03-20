@@ -1,7 +1,7 @@
 import json
 import warnings
 
-from pdf_reader.infrastructure.extractors.mupdf_block_extractor import (
+from pdf_batch_extractor.infrastructure.extractors.mupdf_block_extractor import (
     MuPdfBlockExtractor,
 )
 
@@ -60,3 +60,4 @@ def test_legacy_extractor_emits_deprecation_warning(tmp_path):
         MuPdfBlockExtractor([], str(output_xml_path), str(doc_type_path))
 
     assert any(item.category is DeprecationWarning for item in captured)
+

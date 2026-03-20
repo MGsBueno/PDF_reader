@@ -1,6 +1,6 @@
 import fitz
 
-from pdf_reader.domain.models import LineData
+from pdf_batch_extractor.domain.models import LineData
 
 
 class PyMuPdfLineExtractor:
@@ -35,3 +35,4 @@ class PyMuPdfLineExtractor:
                         )
 
         return lines
+

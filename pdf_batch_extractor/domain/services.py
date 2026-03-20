@@ -1,7 +1,7 @@
 import re
 from xml.sax.saxutils import escape
 
-from pdf_reader.domain.models import BlockContent, DocumentTypeConfig, LineData
+from pdf_batch_extractor.domain.models import BlockContent, DocumentTypeConfig, LineData
 
 
 class BlockDetector:
@@ -39,3 +39,4 @@ def serialize_block(block: BlockContent) -> str:
     tag = build_xml_tag(block.name)
     escaped_text = escape(block.text.strip())
     return f"  <{tag}>{escaped_text}</{tag}>"
+
