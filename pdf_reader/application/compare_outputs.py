@@ -44,7 +44,9 @@ def compare_folders(targets, output_path):
 
             for index, left_name in enumerate(target_names):
                 for right_name in target_names[index + 1 :]:
-                    if not compare_jsons(loaded_jsons[left_name], loaded_jsons[right_name]):
+                    if not compare_jsons(
+                        loaded_jsons[left_name], loaded_jsons[right_name]
+                    ):
                         difference.append(f"{left_name} vs {right_name}")
 
             if difference:

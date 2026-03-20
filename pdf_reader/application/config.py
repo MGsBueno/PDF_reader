@@ -1,6 +1,7 @@
 import json
 import os
 from dataclasses import dataclass, field
+from typing import Any, cast
 
 
 @dataclass(frozen=True)
@@ -33,7 +34,9 @@ class RuntimeConfig:
     output_dir: str = "./output"
     processing: ProcessingConfig = field(default_factory=ProcessingConfig)
     comparison: ComparisonConfig = field(default_factory=ComparisonConfig)
-    doc_type_generation: DocTypeGenerationConfig = field(default_factory=DocTypeGenerationConfig)
+    doc_type_generation: DocTypeGenerationConfig = field(
+        default_factory=DocTypeGenerationConfig
+    )
 
 
 def _load_dotenv(env_path: str) -> dict[str, str]:
@@ -56,7 +59,7 @@ def _load_dotenv(env_path: str) -> dict[str, str]:
     return loaded_values
 
 
-def _expand_env_value(value):
+def _expand_env_value(value: Any) -> Any:
     if isinstance(value, str):
         return os.path.expandvars(value)
     if isinstance(value, list):
@@ -70,14 +73,18 @@ def _env_or_value(env_name: str, current_value: str) -> str:
     return os.getenv(env_name, current_value)
 
 
-def _apply_env_overrides(data: dict) -> dict:
-    runtime_data = _expand_env_value(data)
+def _apply_env_overrides(data: dict[str, Any]) -> dict[str, Any]:
+    runtime_data = cast(dict[str, Any], _expand_env_value(data))
     processing_data = dict(runtime_data.get("processing", {}))
     comparison_data = dict(runtime_data.get("comparison", {}))
     doc_type_generation_data = dict(runtime_data.get("doc_type_generation", {}))
 
-    runtime_data["input_dir"] = _env_or_value("PDF_READER_INPUT_DIR", runtime_data.get("input_dir", "./input"))
-    runtime_data["output_dir"] = _env_or_value("PDF_READER_OUTPUT_DIR", runtime_data.get("output_dir", "./output"))
+    runtime_data["input_dir"] = _env_or_value(
+        "PDF_READER_INPUT_DIR", runtime_data.get("input_dir", "./input")
+    )
+    runtime_data["output_dir"] = _env_or_value(
+        "PDF_READER_OUTPUT_DIR", runtime_data.get("output_dir", "./output")
+    )
 
     processing_data["output_file"] = _env_or_value(
         "PDF_READER_OUTPUT_FILE",
@@ -114,19 +121,23 @@ def _resolve_path(base_dir: str, path: str) -> str:
     return os.path.abspath(os.path.join(base_dir, path))
 
 
-def _build_comparison_targets(raw_targets: list[dict] | None) -> list[ComparisonTarget]:
+def _build_comparison_targets(
+    raw_targets: list[dict[str, Any]] | None,
+) -> list[ComparisonTarget]:
     if not raw_targets:
-        # Example local execution targets. Override them in config.json to compare your own contexts.
         return [
             ComparisonTarget(name="extractor_a", path="./output/extractor_a"),
             ComparisonTarget(name="extractor_b", path="./output/extractor_b"),
             ComparisonTarget(name="extractor_c", path="./output/extractor_c"),
         ]
 
-    return [ComparisonTarget(name=target["name"], path=target["path"]) for target in raw_targets]
+    return [
+        ComparisonTarget(name=target["name"], path=target["path"])
+        for target in raw_targets
+    ]
 
 
-def build_runtime_config(data: dict) -> RuntimeConfig:
+def build_runtime_config(data: dict[str, Any]) -> RuntimeConfig:
     processing_data = data.get("processing", {})
     comparison_data = data.get("comparison", {})
     doc_type_generation_data = data.get("doc_type_generation", {})
@@ -135,18 +146,14 @@ def build_runtime_config(data: dict) -> RuntimeConfig:
         input_dir=data.get("input_dir", "./input"),
         output_dir=data.get("output_dir", "./output"),
         processing=ProcessingConfig(
-            # Example execution default. Override it in config.json for custom pipelines.
             output_file=processing_data.get("output_file", "result.xml"),
-            # Example execution default. Override it in config.json for other schemas.
             doc_type_path=processing_data.get("doc_type_path", "doc_type.json"),
         ),
         comparison=ComparisonConfig(
             targets=_build_comparison_targets(comparison_data.get("targets")),
-            # Example execution default. Override it in config.json for custom reports.
             output_file=comparison_data.get("output_file", "differences.json"),
         ),
         doc_type_generation=DocTypeGenerationConfig(
-            # Example profile. Use any supported profile name or add your own profile definition.
             profile=doc_type_generation_data.get("profile", "generic_example"),
             output_path=doc_type_generation_data.get("output_path", "doc_type.json"),
         ),
@@ -162,7 +169,12 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
     _load_dotenv(os.path.join(base_dir, ".env"))
 
     with open(config_path, "r", encoding="utf-8") as file:
-        config = build_runtime_config(_apply_env_overrides(json.load(file)))
+        raw_data = json.load(file)
+
+    if not isinstance(raw_data, dict):
+        raise ValueError("Configuration file must contain a JSON object")
+
+    config = build_runtime_config(_apply_env_overrides(cast(dict[str, Any], raw_data)))
 
     return RuntimeConfig(
         input_dir=_resolve_path(base_dir, config.input_dir),
@@ -173,7 +185,9 @@ def load_runtime_config(config_path: str = "config.json") -> RuntimeConfig | Non
         ),
         comparison=ComparisonConfig(
             targets=[
-                ComparisonTarget(name=target.name, path=_resolve_path(base_dir, target.path))
+                ComparisonTarget(
+                    name=target.name, path=_resolve_path(base_dir, target.path)
+                )
                 for target in config.comparison.targets
             ],
             output_file=config.comparison.output_file,

@@ -27,7 +27,10 @@ class PyMuPdfLineExtractor:
                             LineData(
                                 text=text,
                                 font_size=max(span["size"] for span in spans),
-                                is_bold=any("bold" in span.get("font", "").lower() for span in spans),
+                                is_bold=any(
+                                    "bold" in span.get("font", "").lower()
+                                    for span in spans
+                                ),
                             )
                         )
 

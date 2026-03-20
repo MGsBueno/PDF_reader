@@ -3,7 +3,12 @@ import time
 
 from pdf_reader.domain.models import BlockContent
 from pdf_reader.domain.services import BlockDetector
-from pdf_reader.application.ports import BlockWriter, BlockWriterFactory, DocumentTypeConfigLoader, LineExtractor
+from pdf_reader.application.ports import (
+    BlockWriter,
+    BlockWriterFactory,
+    DocumentTypeConfigLoader,
+    LineExtractor,
+)
 
 
 class PdfBatchProcessor:
@@ -17,7 +22,9 @@ class PdfBatchProcessor:
         self._config_loader = config_loader
         self._writer_factory = writer_factory
 
-    def process(self, pdf_paths: list[str], output_xml_path: str, doc_type_path: str) -> None:
+    def process(
+        self, pdf_paths: list[str], output_xml_path: str, doc_type_path: str
+    ) -> None:
         config = self._config_loader.load(doc_type_path)
         detector = BlockDetector(config)
         writer = self._writer_factory(output_xml_path)
@@ -27,14 +34,18 @@ class PdfBatchProcessor:
             self._process_single_pdf(pdf_path, detector, writer)
         writer.finish_document()
 
-    def _process_single_pdf(self, pdf_path: str, detector: BlockDetector, writer: BlockWriter) -> None:
+    def _process_single_pdf(
+        self, pdf_path: str, detector: BlockDetector, writer: BlockWriter
+    ) -> None:
         current_block_name: str | None = None
         current_text = ""
 
         for line in self._line_extractor.extract_lines(pdf_path):
             if detector.should_ignore(line.text):
                 if current_block_name:
-                    writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+                    writer.write_block(
+                        BlockContent(name=current_block_name, text=current_text.strip())
+                    )
                     current_block_name = None
                     current_text = ""
                 continue
@@ -42,7 +53,9 @@ class PdfBatchProcessor:
             block_name = detector.detect(line)
             if block_name:
                 if current_block_name:
-                    writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+                    writer.write_block(
+                        BlockContent(name=current_block_name, text=current_text.strip())
+                    )
                 current_block_name = block_name
                 current_text = line.text
                 continue
@@ -51,7 +64,9 @@ class PdfBatchProcessor:
                 current_text += f" {line.text}"
 
         if current_block_name:
-            writer.write_block(BlockContent(name=current_block_name, text=current_text.strip()))
+            writer.write_block(
+                BlockContent(name=current_block_name, text=current_text.strip())
+            )
 
 
 def collect_pdf_paths(input_dir: str) -> list[str]:

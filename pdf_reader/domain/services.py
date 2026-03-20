@@ -15,17 +15,24 @@ class BlockDetector:
         text_lower = line.text.lower()
         for block_name, rule in self._config.blocks.items():
             for pattern in rule.match:
-                if re.match(pattern, text_lower, re.IGNORECASE) and line.font_size >= rule.minimum_description_font_size:
+                if (
+                    re.match(pattern, text_lower, re.IGNORECASE)
+                    and line.font_size >= rule.minimum_description_font_size
+                ):
                     return block_name
         return None
 
     def should_ignore(self, text: str) -> bool:
         text_lower = text.lower()
-        return any(text_lower.startswith(ignored.lower()) for ignored in self._config.ignore)
+        return any(
+            text_lower.startswith(ignored.lower()) for ignored in self._config.ignore
+        )
 
 
 def build_xml_tag(block_name: str) -> str:
-    return block_name.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    return (
+        block_name.replace(" ", "_").replace("(", "").replace(")", "").replace("/", "_")
+    )
 
 
 def serialize_block(block: BlockContent) -> str:

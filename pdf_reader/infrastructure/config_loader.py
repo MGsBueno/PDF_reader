@@ -12,14 +12,18 @@ class JsonDocumentTypeConfigLoader:
             raise ValueError("Document type configuration must be a JSON object.")
 
         if "structures" not in doc_type:
-            raise ValueError("Document type configuration must contain a top-level 'structures' object.")
+            raise ValueError(
+                "Document type configuration must contain a top-level 'structures' object."
+            )
 
         structures = doc_type["structures"]
         if not isinstance(structures, dict):
             raise ValueError("'structures' must be a JSON object.")
 
         if "blocos" in structures or "ignorar" in structures:
-            raise ValueError("Portuguese document type keys are no longer supported. Use 'blocks' and 'ignore'.")
+            raise ValueError(
+                "Portuguese document type keys are no longer supported. Use 'blocks' and 'ignore'."
+            )
 
         if "blocks" not in structures or "ignore" not in structures:
             raise ValueError("'structures' must define both 'blocks' and 'ignore'.")
@@ -43,10 +47,16 @@ class JsonDocumentTypeConfigLoader:
             raise ValueError(f"Block '{block_name}' must be a JSON object.")
 
         match = block_config.get("match")
-        if not isinstance(match, list) or not all(isinstance(pattern, str) for pattern in match):
-            raise ValueError(f"Block '{block_name}' must define 'match' as a list of regex strings.")
+        if not isinstance(match, list) or not all(
+            isinstance(pattern, str) for pattern in match
+        ):
+            raise ValueError(
+                f"Block '{block_name}' must define 'match' as a list of regex strings."
+            )
 
-        minimum_description_font_size = block_config.get("minimum_description_font_size", 0)
+        minimum_description_font_size = block_config.get(
+            "minimum_description_font_size", 0
+        )
         if not isinstance(minimum_description_font_size, (int, float)):
             raise ValueError(
                 f"Block '{block_name}' must define 'minimum_description_font_size' as a number when present."
