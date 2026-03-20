@@ -66,6 +66,8 @@ pdf_reader/
     writers/
       xml_writer.py
 tests/
+.env.example
+Algorithm.txt
 config.json
 doc_type.json
 requirements.txt
@@ -88,7 +90,20 @@ pip install -r requirements-dev.txt
 
 ### 2. Configure input and output paths
 
-Update `config.json`:
+You can configure the project with `config.json`, `.env`, or both.
+
+Example `.env`:
+
+```dotenv
+PDF_READER_INPUT_DIR=./input
+PDF_READER_OUTPUT_DIR=./output
+PDF_READER_OUTPUT_FILE=result.xml
+PDF_READER_DOC_TYPE_PATH=./doc_type.json
+```
+
+You can start by copying `.env.example` to `.env`.
+
+Then update `config.json` if you want extra settings:
 
 ```json
 {
@@ -132,18 +147,18 @@ Example `doc_type.json`:
 
 ```json
 {
-  "estruturas": {
-    "blocos": {
-      "Titulo": {
-        "match": ["^titulo"],
-        "descricao_fonte_minima": 10
+  "structures": {
+    "blocks": {
+      "Title": {
+        "match": ["^title"],
+        "minimum_description_font_size": 10
       },
-      "Resumo": {
-        "match": ["^resumo"],
-        "descricao_fonte_minima": 10
+      "Summary": {
+        "match": ["^summary"],
+        "minimum_description_font_size": 10
       }
     },
-    "ignorar": ["Pagina", "Rodape"]
+    "ignore": ["Page", "Footer"]
   }
 }
 ```
@@ -163,10 +178,10 @@ output/result.xml
 Example output:
 
 ```xml
-<dados>
-  <Titulo>Titulo do documento</Titulo>
-  <Resumo>Resumo consolidado do conteudo extraido</Resumo>
-</dados>
+<data>
+  <Title>Document title</Title>
+  <Summary>Consolidated summary of the extracted content</Summary>
+</data>
 ```
 
 ## CLI Commands
@@ -200,6 +215,22 @@ python -m pdf_reader.entrypoints.cleanup_output --config .\config.json
 ### `config.json`
 
 Defines runtime input and output directories. Relative paths are resolved from the directory that contains the chosen config file.
+
+### `.env`
+
+If a `.env` file exists in the same directory as `config.json`, it is loaded automatically before the runtime config is built.
+
+Supported variables:
+
+- `PDF_READER_INPUT_DIR`
+- `PDF_READER_OUTPUT_DIR`
+- `PDF_READER_OUTPUT_FILE`
+- `PDF_READER_DOC_TYPE_PATH`
+- `PDF_READER_COMPARISON_OUTPUT_FILE`
+- `PDF_READER_DOC_TYPE_PROFILE`
+- `PDF_READER_DOC_TYPE_OUTPUT_PATH`
+
+You can also reference environment variables inside `config.json` with `${VAR_NAME}` syntax.
 
 ### `doc_type.json`
 
