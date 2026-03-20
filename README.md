@@ -89,6 +89,7 @@ requirements-dev.txt
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements-dev.txt
+pip install -e .
 ```
 
 ### 2. Configure input and output paths
@@ -195,10 +196,23 @@ Example output:
 python -m pdf_reader.entrypoints.process_pdf --config .\config.json
 ```
 
+Installed CLI:
+
+```powershell
+pdf-reader --config .\config.json
+pdf-reader-process --config .\config.json
+```
+
 ### Generate `doc_type.json`
 
 ```powershell
 python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
+```
+
+Installed CLI:
+
+```powershell
+pdf-reader-generate-doc-type --config .\config.json
 ```
 
 ### Compare extraction outputs
@@ -207,10 +221,22 @@ python -m pdf_reader.entrypoints.generate_doc_type --config .\config.json
 python -m pdf_reader.entrypoints.compare_outputs --config .\config.json
 ```
 
+Installed CLI:
+
+```powershell
+pdf-reader-compare-outputs --config .\config.json
+```
+
 ### Clean output directory
 
 ```powershell
 python -m pdf_reader.entrypoints.cleanup_output --config .\config.json
+```
+
+Installed CLI:
+
+```powershell
+pdf-reader-cleanup-output --config .\config.json
 ```
 
 ## Configuration

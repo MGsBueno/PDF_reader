@@ -1,3 +1,48 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pdf-reader"
+version = "0.1.0"
+description = "Structured PDF extraction pipeline for block-based document parsing."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+  { name = "MGsBueno" },
+]
+keywords = ["pdf", "parser", "xml", "pymupdf", "cli"]
+classifiers = [
+  "Development Status :: 2 - Pre-Alpha",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Text Processing :: Markup :: XML",
+]
+dependencies = [
+  "pymupdf==1.27.2.2",
+]
+
+[project.urls]
+Homepage = "https://github.com/MGsBueno/PDF_reader"
+Repository = "https://github.com/MGsBueno/PDF_reader"
+Issues = "https://github.com/MGsBueno/PDF_reader/issues"
+
+[project.scripts]
+pdf-reader = "pdf_reader.entrypoints.process_pdf:main"
+pdf-reader-process = "pdf_reader.entrypoints.process_pdf:main"
+pdf-reader-generate-doc-type = "pdf_reader.entrypoints.generate_doc_type:main"
+pdf-reader-compare-outputs = "pdf_reader.entrypoints.compare_outputs:main"
+pdf-reader-cleanup-output = "pdf_reader.entrypoints.cleanup_output:main"
+
+[tool.setuptools.packages.find]
+include = ["pdf_reader*"]
+
 [tool.black]
 line-length = 88
 target-version = ["py310", "py311"]
