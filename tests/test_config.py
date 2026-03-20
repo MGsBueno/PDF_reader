@@ -1,4 +1,5 @@
 from pdf_reader.application.config import build_runtime_config, load_runtime_config
+from pdf_reader.infrastructure.config_loader import JsonDocumentTypeConfigLoader
 
 
 def test_build_runtime_config_uses_explicit_values():
@@ -150,3 +151,39 @@ def test_load_runtime_config_expands_env_placeholders(tmp_path, monkeypatch):
     assert config is not None
     assert config.input_dir == str((tmp_path / "placeholder-input").resolve())
     assert config.output_dir == str((tmp_path / "placeholder-output").resolve())
+
+
+def test_document_type_config_loader_requires_structures_root(tmp_path):
+    path = tmp_path / "doc_type.json"
+    path.write_text('{"blocks": {}}', encoding="utf-8")
+
+    loader = JsonDocumentTypeConfigLoader()
+
+    try:
+        loader.load(str(path))
+        assert False, "Expected ValueError for missing 'structures' root"
+    except ValueError as error:
+        assert "top-level 'structures'" in str(error)
+
+
+def test_document_type_config_loader_rejects_portuguese_keys(tmp_path):
+    path = tmp_path / "doc_type.json"
+    path.write_text(
+        """
+{
+  "structures": {
+    "blocos": {},
+    "ignorar": []
+  }
+}
+        """.strip(),
+        encoding="utf-8",
+    )
+
+    loader = JsonDocumentTypeConfigLoader()
+
+    try:
+        loader.load(str(path))
+        assert False, "Expected ValueError for Portuguese keys"
+    except ValueError as error:
+        assert "no longer supported" in str(error)

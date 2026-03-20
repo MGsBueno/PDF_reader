@@ -30,24 +30,27 @@ The project follows a layered package structure:
 - `pdf_reader.entrypoints`
   CLI-facing entrypoints for local execution
 
-This repository currently uses a layered architecture. The empty legacy `layers/` folder is not part of the runtime design.
+This repository currently uses a layered architecture with a small composition root. The empty legacy `layers/` folder is not part of the runtime design.
 
 ### Processing Flow
 
 1. Load runtime configuration from an explicit config file
 2. Load block-detection rules from the configured `doc_type.json`
-3. Extract lines from PDFs through the infrastructure extractor
-4. Classify lines into logical blocks in the domain layer
-5. Persist the final XML output
+3. Compose concrete adapters in the bootstrap/composition root
+4. Extract lines from PDFs through the infrastructure extractor
+5. Classify lines into logical blocks in the domain layer
+6. Persist the final XML output
 
 ## Repository Layout
 
 ```text
 pdf_reader/
+  bootstrap.py
   application/
     cleanup_output.py
     compare_outputs.py
     config.py
+    ports.py
     generate_doc_type.py
     process_pdf_batch.py
   domain/
@@ -240,6 +243,12 @@ Defines:
 - regex match rules
 - minimum font thresholds
 - ignored text prefixes
+
+The supported schema is now strict and uses the English keys `structures`, `blocks`, `ignore`, and `minimum_description_font_size`.
+
+### Legacy compatibility
+
+`MuPdfBlockExtractor` is kept only as a legacy compatibility wrapper. New integrations should use the main `PdfBatchProcessor` flow through the composition root in `pdf_reader/bootstrap.py`.
 
 ## Development
 
