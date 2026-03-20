@@ -62,3 +62,21 @@ Certifique-se de instalar as bibliotecas necessárias antes de executar os scrip
 ```bash
 pip install pdfplumber pymupdf pdfminer.six
 ```
+
+## Ambiente Virtual
+
+Para criar e ativar um ambiente virtual no Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements-dev.txt
+```
+
+## Testes
+
+Para executar a suíte de testes:
+
+```powershell
+python -m pytest -q tests
+```
